@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>MigrationFlow OSINT</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>MigrationFlow <span>OSINT</span></h1>
+  <div class="sub">Flujos migratorios y desplazamiento forzado a escala global</div>
+  <div class="status-row">
+    <span id="lastUpdate" class="badge">—</span>
+    <span id="totalBadge" class="badge">0 eventos</span>
+  </div>
+</header>
+
+<main>
+  <div id="map"></div>
+
+  <aside id="panel">
+    <section class="panel-section">
+      <h2>Categorías</h2>
+      <div id="typeFilters" class="filters"></div>
+      <h2>Nivel mínimo</h2>
+      <div id="levelFilters" class="filters level-filters">
+        <button data-level="info" class="active">Todas</button>
+        <button data-level="warning" class="lvl-warning">Warning</button>
+        <button data-level="alert" class="lvl-alert">Alert</button>
+        <button data-level="critical" class="lvl-critical">Critical</button>
+      </div>
+      <h2>Mapa</h2>
+      <label class="chk"><input type="checkbox" id="heatToggle"> Densidad de incidentes (heatmap)</label>
+      <label class="chk"><input type="checkbox" id="darkToggle" checked> Tema oscuro</label>
+    </section>
+
+    <section class="panel-section">
+      <h2>Resumen</h2>
+      <div id="summaryBox" class="summary">Cargando…</div>
+    </section>
+
+    <section class="panel-section">
+      <h2>Fuentes</h2>
+      <div id="sourcesBox" class="sources">Cargando…</div>
+    </section>
+
+    <footer class="foot">
+      Datos: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX
+    </footer>
+  </aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.env
+logs/
+data/*.csv
+data/*.xlsx
+data/*.json
+!data/countries_geo.json
+*.db
+.DS_Store
