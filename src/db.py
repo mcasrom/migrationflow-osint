@@ -233,6 +233,33 @@ def expire_events() -> int:
         release_conn(conn)
 
 
+def expire_source_type(source: str, event_type: str) -> int:
+    """Expira todos los eventos activos de un (source, event_type).
+
+    Se usa cuando una fuente nueva (p. ej. un informe más reciente) sustituye
+    por completo a la anterior para evitar duplicar datos en el mapa.
+    """
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE events SET status=%s, updated_at=now() "
+            "WHERE source=%s AND event_type=%s AND status=%s",
+            (EVENT_STATUS_EXPIRED, source, event_type, EVENT_STATUS_ACTIVE),
+        )
+        n = cur.rowcount
+        conn.commit()
+        if n:
+            logger.info("[db] %d eventos expirados (%s/%s)", n, source, event_type)
+        return n
+    except Exception as e:
+        conn.rollback()
+        logger.error("[db] expire_source_type error: %s", e)
+        return 0
+    finally:
+        release_conn(conn)
+
+
 def record_run_start(collector: str) -> int:
     conn = get_conn()
     try:
@@ -337,6 +364,7 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
             "SELECT event_type, count(*) AS n, round(sum(value)::numeric) AS total, "
             "min(reported_at)::date AS from_d, max(reported_at)::date AS to_d "
             "FROM events WHERE iso3=%s AND status='active' "
+            "AND event_type NOT IN ('arrivals','arrivals_route') "
             "AND reported_at >= now() - make_interval(days => %s) "
             "GROUP BY event_type", (iso3, days))
         activity = {}
@@ -351,6 +379,7 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
         cur.execute(
             "SELECT event_type, count(*) AS n, round(sum(value)::numeric) AS total "
             "FROM events WHERE iso3=%s AND status='active' "
+            "AND event_type NOT IN ('arrivals','arrivals_route') "
             "AND reported_at >= now() - make_interval(days => %s) "
             "AND reported_at < now() - make_interval(days => %s) "
             "GROUP BY event_type", (iso3, days * 2, days))
@@ -369,9 +398,17 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
             "ORDER BY event_type, reported_at DESC) t", (iso3,))
         affected = cur.fetchone()["round"]
 
+        cur.execute(
+            "SELECT value, to_char(reported_at, 'YYYY') AS year FROM events "
+            "WHERE iso3=%s AND status='active' AND event_type='arrivals' "
+            "AND value IS NOT NULL ORDER BY reported_at DESC LIMIT 1", (iso3,))
+        ar = cur.fetchone()
+        arrivals = {"value": float(ar["value"]), "year": ar["year"]} if ar else None
+
         return {"iso3": iso3, "name": name, "days": days,
                 "affected": float(affected) if affected is not None else None,
-                "stocks": stocks, "activity": activity, "delta": delta}
+                "stocks": stocks, "activity": activity, "delta": delta,
+                "arrivals": arrivals}
     finally:
         release_conn(conn)
 
@@ -488,6 +525,51 @@ def global_stock(event_type: str) -> Optional[float]:
             "ORDER BY iso3, reported_at DESC) t", (event_type,))
         r = cur.fetchone()
         return float(r[0]) if r and r[0] is not None else None
+    finally:
+        release_conn(conn)
+
+
+def route_arrivals_latest(route_key: str) -> Optional[dict]:
+    """Último total mensual de entradas (Frontex) para una ruta."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT value, reported_at, country FROM events "
+            "WHERE iso3=%s AND status='active' AND event_type='arrivals_route' "
+            "AND value IS NOT NULL ORDER BY reported_at DESC LIMIT 1", (route_key,))
+        r = cur.fetchone()
+        if not r:
+            return None
+        return {"value": float(r["value"]),
+                "reported_at": r["reported_at"].isoformat(),
+                "name": r["country"]}
+    finally:
+        release_conn(conn)
+
+
+def cf_report() -> Optional[dict]:
+    """Último informe de Caminando Fronteras (víctimas por ruta) + total."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT iso3, value, country, reported_at, raw_json FROM events "
+            "WHERE source='caminando_fronteras' AND event_type='cf_victims' "
+            "AND status='active' ORDER BY reported_at DESC, iso3")
+        rows = list(cur.fetchall())
+        if not rows:
+            return None
+        latest = [r for r in rows if r["reported_at"] == rows[0]["reported_at"]]
+        raw = rows[0]["raw_json"] or {}
+        return {
+            "reported_at": rows[0]["reported_at"].isoformat(),
+            "period": raw.get("period"),
+            "total": float(sum(float(r["value"]) for r in latest)),
+            "url": raw.get("url"),
+            "routes": [{"key": r["iso3"], "name": r["country"],
+                        "value": float(r["value"])} for r in latest],
+        }
     finally:
         release_conn(conn)
 

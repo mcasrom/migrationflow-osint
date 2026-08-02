@@ -3,8 +3,8 @@ const LEVEL_RANK = { info: 0, warning: 1, alert: 2, critical: 3 };
 const LEVEL_COLOR = { info: "#4a9eff", warning: "#ffb020", alert: "#ff7043", critical: "#f43f5e" };
 const KOFI_URL = "https://ko-fi.com/m_castillo";
 
-const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "refugees_origin", "missing", "news"];
-const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "news"];
+const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "refugees_origin", "arrivals", "arrivals_route", "missing", "cf_victims", "news"];
+const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "arrivals_route", "news"];
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
 let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
@@ -517,6 +517,10 @@ function countryPopupHtml(d) {
       `</table>`;
   } else {
     html += `<div class="cp-none">${t("cp_no_stock")}</div>`;
+  }
+  if (d.arrivals) {
+    html += `<div class="cp-sub">${t("cp_arrivals")} · ${d.arrivals.year}</div>
+      <div class="cp-row"><span>${t("cp_entries")}</span><b>${fmt(d.arrivals.value)}</b></div>`;
   }
   const keys = Object.keys(act);
   if (keys.length) {

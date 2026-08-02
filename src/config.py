@@ -35,6 +35,20 @@ HDX_MMP_URL = ("https://data.humdata.org/dataset/fc59785a-31d2-4018-aac7-6b9f619
                "resource/99078436-9c4a-473b-a073-428304a9cf8a/"
                "download/iom-missing-migrants-project-data.csv")
 
+# ── Frontex (ArcGIS FeatureServer público, detecciones de IBC) ────
+# Capa 1 = países de origen con detecciones mensuales (fYYYY_MM, ~36 meses).
+# Capa 0 = rutas migratorias, total del mes actual + top nacionalidades.
+FRONTEX_SERVER = ("https://services9.arcgis.com/dujMioKFm7jZpirQ/arcgis/rest/"
+                  "services/DetectionsOfIBCs/FeatureServer")
+FRONTEX_COUNTRIES_LAYER = 1
+FRONTEX_ROUTES_LAYER = 0
+FRONTEX_YEARS_BACK = 2           # años completos a ingestar (además del parcial actual)
+FRONTEX_MIN_ROUTE_TOTAL = 100    # mínimo mensual por ruta para ingestar
+
+# ── Caminando Fronteras (curado: RSS de búsqueda + parse del informe) ──
+CF_RSS_SEARCH = "https://caminandofronteras.org/search/monitoreo/feed/rss2/"
+CF_MONITOREO_PREFIX = "/monitoreo/"
+
 # ── Noticias (ReliefWeb RSS, público sin appname) ────────────
 RELIEFWEB_RSS = "https://reliefweb.int/updates/rss.xml"
 NEWS_KEYWORDS = [
@@ -53,6 +67,9 @@ EVENT_TYPES = {
     "displacement": "Desplazamiento por conflicto (IDMC)",
     "dtm_idp": "Stock IDP (IOM DTM)",
     "missing": "Muertos y desaparecidos en migración",
+    "arrivals": "Entradas irregulares (Frontex)",
+    "arrivals_route": "Entradas del mes por ruta (Frontex)",
+    "cf_victims": "Víctimas en fronteras españolas (CF)",
     "news": "Noticias y alertas humanitarias",
 }
 
@@ -69,6 +86,9 @@ MIN_VALUE = {
     "displacement": 50000,
     "dtm_idp": 10000,
     "missing": 0,
+    "arrivals": 500,          # entradas anuales por país de origen
+    "arrivals_route": 100,
+    "cf_victims": 1,
 }
 
 # ── Severity thresholds (warning, alert, critical) ───────────
@@ -80,6 +100,9 @@ SEVERITY_THRESHOLDS = {
     "displacement": (100_000, 500_000, 2_000_000),
     "dtm_idp": (50_000, 300_000, 1_000_000),
     "missing": (1, 10, 100),
+    "arrivals": (10_000, 50_000, 250_000),
+    "arrivals_route": (5_000, 15_000, 40_000),
+    "cf_victims": (50, 200, 500),
     "news": (0, 0, 0),
 }
 
@@ -89,6 +112,8 @@ SOURCE_TTL_DAYS = {
     "idmc": 420,
     "iom_dtm": 60,             # rondas semanales
     "missing_migrants": 365,
+    "frontex": 90,             # renovado en cada ejecución mientras el dato siga en la fuente
+    "caminando_fronteras": 210,  # informes semestrales; la nueva ejecución expira el anterior
     "news": 14,                # noticias: caducan en 2 semanas
 }
 

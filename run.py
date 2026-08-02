@@ -23,6 +23,8 @@ COLLECTORS = {
     "idmc": ("src.collectors.idmc", "IDMCCollector"),
     "iom_dtm": ("src.collectors.iom_dtm", "IOMDTMCollector"),
     "missing_migrants": ("src.collectors.missing_migrants", "MissingMigrantsCollector"),
+    "frontex": ("src.collectors.frontex", "FrontexCollector"),
+    "caminando_fronteras": ("src.collectors.caminando_fronteras", "CaminandoFronterasCollector"),
     "news": ("src.collectors.news", "NewsCollector"),
 }
 

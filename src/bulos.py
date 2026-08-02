@@ -138,6 +138,8 @@ TOPICS = [
             ("incidents", "missing", "CEUTA_BBOX", 365),
             ("stocks", "asylum", "ESP", None),
             ("stocks", "refugees", "ESP", None),
+            ("route_arrivals", None, "ROUTE_WMED", None),
+            ("cf_total", None, None, None),
         ],
     },
     {
@@ -147,6 +149,8 @@ TOPICS = [
         "points": [
             ("region_incidents", "missing", "MEDITERRANEO_W", 365),
             ("global_missing", None, None, 365),
+            ("route_arrivals", None, "ROUTE_CMED", None),
+            ("cf_total", None, None, None),
         ],
     },
     {
@@ -188,6 +192,10 @@ def _point_label(kind: str, lang: str) -> str:
         "global_missing": {"es": "Muertes registradas (MMP)", "en": "Recorded deaths (MMP)"},
         "stocks": {"es": None, "en": None},          # usa etiqueta del tipo
         "global_stock": {"es": "Refugiados en el mundo (UNHCR)", "en": "Refugees worldwide (UNHCR)"},
+        "route_arrivals": {"es": "Entradas irregulares este mes (Frontex)",
+                           "en": "Irregular arrivals this month (Frontex)"},
+        "cf_total": {"es": "Víctimas hacia el Estado español (CF, último informe)",
+                     "en": "Victims heading to Spain (CF, latest report)"},
     }
     return labels[kind][lang]
 
@@ -233,8 +241,26 @@ def build_context(text: str, lang: str = "es", days: int = 365) -> list[dict]:
                     if lang == "es":
                         val = val.replace(",", ".")
                     points.append({"label": _point_label("global_stock", lang), "value": val})
+            elif kind == "route_arrivals":
+                r = db.route_arrivals_latest(ref)
+                if r:
+                    when = r["reported_at"][:7]
+                    points.append({"label": f"{_point_label('route_arrivals', lang)} ({r['name']})",
+                                   "value": f"{int(r['value']):,} · {when}"})
+            elif kind == "cf_total":
+                rep = db.cf_report()
+                if rep:
+                    val = f"{int(rep['total']):,}"
+                    if lang == "es":
+                        val = val.replace(",", ".")
+                    points.append({"label": f"{_point_label('cf_total', lang)}",
+                                   "value": f"{val} · {rep['period']}"})
         if points:
+            sources = [{"label": "IOM Missing Migrants Project", "url": "https://missingmigrants.iom.int/"},
+                       {"label": "UNHCR Refugee Data Finder", "url": "https://www.unhcr.org/refugee-statistics/"}]
+            if tp["id"] in ("ceuta", "mediterraneo"):
+                sources.append({"label": "Frontex · Detections of IBCs", "url": "https://www.frontex.europa.eu/"})
+                sources.append({"label": "Caminando Fronteras", "url": "https://caminandofronteras.org/"})
             cards.append({"id": tp["id"], "label": tp["label"][lang], "points": points,
-                          "sources": [{"label": "IOM Missing Migrants Project", "url": "https://missingmigrants.iom.int/"},
-                                      {"label": "UNHCR Refugee Data Finder", "url": "https://www.unhcr.org/refugee-statistics/"}]})
+                          "sources": sources})
     return cards
