@@ -324,6 +324,7 @@ function countryPopupHtml(d) {
   } else {
     html += `<div class="cp-none">${t("cp_none")}</div>`;
   }
+  if (act.missing) html += `<div class="cp-note">⚠ ${t("cp_note_deaths")}</div>`;
   return html + `</div>`;
 }
 

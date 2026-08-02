@@ -311,7 +311,7 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
         cur.execute(
             "SELECT DISTINCT ON (event_type) event_type, value, reported_at "
             "FROM events WHERE iso3=%s AND status='active' "
-            "AND event_type IN ('refugees','asylum','idp','displacement','dtm_idp') "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
             "ORDER BY event_type, reported_at DESC", (iso3,))
         stocks = [
             {"type": r["event_type"], "value": r["value"],
@@ -348,8 +348,11 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
             }
 
         cur.execute(
-            "SELECT round(sum(value)::numeric) FROM events "
-            "WHERE iso3=%s AND status='active' AND value IS NOT NULL", (iso3,))
+            "SELECT round(sum(value)::numeric) FROM ("
+            "SELECT DISTINCT ON (event_type) value FROM events "
+            "WHERE iso3=%s AND status='active' "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "ORDER BY event_type, reported_at DESC) t", (iso3,))
         affected = cur.fetchone()["round"]
 
         return {"iso3": iso3, "name": name, "days": days,
@@ -371,7 +374,12 @@ def fetch_summary() -> dict:
         by_level = {r[0]: r[1] for r in cur.fetchall()}
         cur.execute("SELECT count(*) FROM events WHERE status='active' AND value IS NOT NULL")
         with_value = cur.fetchone()[0]
-        cur.execute("SELECT sum(value) FROM events WHERE status='active' AND value IS NOT NULL")
+        cur.execute(
+            "SELECT round(sum(value)::numeric) FROM ("
+            "SELECT DISTINCT ON (iso3, event_type) value FROM events "
+            "WHERE status='active' AND value IS NOT NULL "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "ORDER BY iso3, event_type, reported_at DESC) t")
         sum_value = cur.fetchone()[0]
         return {
             "total_active": total,

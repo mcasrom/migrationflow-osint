@@ -74,6 +74,7 @@ const I18N = {
     cp_news: "Noticias y alertas",
     cp_none: "Sin actividad en el período",
     cp_vs: "vs. período previo equivalente",
+    cp_note_deaths: "Muertes/desaparecidos: IOM Missing Migrants Project (solo incidentes confirmados; las ONG registran cifras mayores, p. ej. en la ruta atlántica).",
   },
   en: {
     sub: "Migration flows and forced displacement at a global scale",
@@ -149,12 +150,13 @@ const I18N = {
     cp_news: "News & alerts",
     cp_none: "No activity in the period",
     cp_vs: "vs. equivalent previous period",
+    cp_note_deaths: "Deaths/missing: IOM Missing Migrants Project (confirmed incidents only; NGOs record higher figures, e.g. Atlantic route).",
   },
 };
 
 const TYPE_I18N = {
   refugees: { es: "Refugiados", en: "Refugees" },
-  asylum: { es: "Solicitudes de asilo", en: "Asylum applications" },
+  asylum: { es: "Solicitantes de asilo (stock)", en: "Asylum-seekers (pending)" },
   idp: { es: "Desplazados internos", en: "Internally displaced" },
   displacement: { es: "Desplazamiento", en: "Displacement" },
   dtm_idp: { es: "IDP (DTM)", en: "IDP (DTM)" },
