@@ -14,12 +14,21 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 - **7651 eventos activos**: UNHCR 451 · IDMC 80 · IOM DTM 21 · Missing Migrants 7092 · News 7.
 - **Pipeline automático**: cron `15 2,14 * * *` → `scripts/pipeline.sh` (02:15 y 14:15 UTC, sin intervención).
 - **Frontend**: mapa con clústeres por tipo, niveles, heatmap, **tema claro/oscuro persistente**,
-  filtro por año (2023–2026), **choropleth por país**, **popup de país al hacer click** (últimos
+  filtro por año (2023–2026, afecta a mapa **y summary**), **choropleth por país**, **popup de país al hacer click** (últimos
   365 días + delta vs. período previo, click en choropleth y botón en popups de marcadores),
   capa de rutas migratorias, **botón de compartir (Web Share + portapapeles)**, funnel de
   bienvenida, i18n ES/EN, pestañas Datos / Fuentes / **Acerca de**, **PWA instalable (SW
   registrado, pre-cache, `beforeinstallprompt`)**, export CSV/GeoJSON, botón Ko-fi, pestaña
   Fuentes (metodología, estado, contacto).
+- **Verificador de bulos** (`/api/verify`): 6 bulos recurrentes curados (ayudas 400-900 €, menas 20.000 €,
+  avalancha en la valla, patera=delincuencia, paro sin cotizar, no pagan impuestos) con evidencia y fuentes
+  verificadoras (Maldita, Newtral, ACNUR); sección *¿Es un bulo?* en el panel y enlace desde popups de noticias.
+- **Tarjeta de contexto por datos** (`/api/context`): dado el título de un evento, genera tarjetas con cifras
+  reales de la BD (incidentes MMP por zona/región/mundo, stocks UNHCR) para tópicos Ceuta-Melilla,
+  Ruta del Mediterráneo y Asilo; se inyecta en el popup de noticias.
+- **Alertas push por zona**: suscripción Web Push (VAPID) por región (global/España/Marruecos/Mediterráneo);
+  `scripts/check_alerts.py` (cron `15 */6 * * *`) detecta picos de incidentes (≥2 y ratio 1.5 vs. semana previa)
+  y noticias sobre temas con bulos, con tabla `alert_log` de dedupe.
 - **API de país**: `GET /api/country/{iso3}?days=365` → `{name, affected, stocks, activity, delta}`.
 - **Semántica de datos corregida** (commit `3a91a80`): `affected` y `sum_value` global usan
   **último snapshot por tipo** (sin doble conteo de años consecutivos ni mezclar muertes);
@@ -78,11 +87,12 @@ Priorizada (P1 = mayor valor/esfuerzo).
 
 ### P1 — Siguiente iteración
 - [ ] **Modo tendencia**: color por % de cambio respecto al año anterior (▲▼, rojo/verde). Ya existe el
-      filtro `year`; falta la comparativa en el choropleth o una vista delta.
+      filtro `year` (ahora también en el summary); falta la comparativa en el choropleth o una vista delta.
 - [ ] **Panel de gráficos**: pestaña con serie mensual de incidentes y top países afectados.
 - [ ] **Geocoding fino para news**: localizar subregiones/ciudades (hoy centroide de país).
 - [ ] **Fuente complementaria de muertes** (opcional, desactivada por defecto): ingestar Caminando Fronteras
       u otra fuente con contraste metodológico explícito, en lugar de depender solo de IOM MMP.
+- [ ] **Ampliar dataset de bulos** a más claims (hoy 6 curados) y añadir verificación por URL/claim compartido.
 
 ### P2 — Experiencia
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
@@ -104,7 +114,8 @@ Priorizada (P1 = mayor valor/esfuerzo).
 - **Sampling CPU headless**: no aplica.
 - El funnel de bienvenida se guarda en `localStorage` (`mf_intro_seen`) — al probar cambios, limpiar
   el sitio o usar ventana privada.
-- Service worker con cache-first para assets: tras un deploy, la primera carga puede servir JS viejo;
-  la navegación ya es network-first (SW v8).
+- Service worker con **network-first para assets** (SW v12): tras un deploy basta recargar una vez; las
+  cachés viejas se purgan al activar. Las suscripciones push quedan inválidas si se regeneran las claves VAPID
+  (limpiar `push_subscriptions`).
 - **Muertes = IOM MMP (conservador)**: no refleja estimaciones tipo Caminando Fronteras; comunicado vía
   nota en el popup de país.

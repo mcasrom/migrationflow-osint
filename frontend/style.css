@@ -50,6 +50,38 @@ header .sub { font-size: 11px; color: var(--muted); }
   transition: opacity .2s, transform .2s;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.verify-input {
+  width: 100%; box-sizing: border-box; padding: 9px 11px; font-size: 12px; margin-bottom: 8px;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+}
+.verify-input:focus { outline: none; border-color: var(--accent); }
+.verify-out { margin-top: 8px; }
+.v-loading { font-size: 12px; color: var(--muted); }
+.v-sub { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 6px; }
+.v-card { font-size: 12px; line-height: 1.55; padding: 9px 11px; margin-bottom: 8px; border-radius: 8px;
+  background: var(--panel-2); border: 1px solid var(--line); }
+.v-card b { color: var(--text); }
+.v-card p { margin: 4px 0; color: var(--muted); }
+.v-card .v-ev { color: var(--text); }
+.v-srcs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; margin-top: 6px; }
+.v-srcs a { color: var(--accent); text-decoration: none; }
+.v-srcs a:hover { text-decoration: underline; }
+.v-row { font-size: 12px; line-height: 1.5; padding: 5px 2px; color: var(--text); }
+.v-foot { font-size: 10px; color: var(--muted); margin-top: 8px; font-style: italic; }
+.alerts-note { font-size: 11px; line-height: 1.5; color: var(--muted); margin: 0 0 8px; }
+.alerts .year-select { width: 100%; margin: 4px 0 8px; }
+.alerts-status { font-size: 11px; margin-top: 6px; }
+.alerts-status.ok { color: #34d399; }
+.alerts-status.err { color: #f43f5e; }
+.ctx { margin-top: 8px; border-top: 1px solid var(--line); padding-top: 6px; }
+.ctx-card { font-size: 11px; line-height: 1.5; background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.ctx-card-t { font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.ctx-row { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
+.ctx-row b { color: var(--text); }
+.ctx-actions { text-align: right; }
+.ctx-verify { font-size: 11px; font-weight: 700; color: var(--accent); text-decoration: none; }
+.ctx-verify:hover { text-decoration: underline; }
 #map { position: absolute; inset: 0; }
 #panel {
   position: fixed; z-index: 1100; top: 52px; right: 12px; bottom: 12px; width: 300px;

@@ -83,6 +83,32 @@
         <h2 data-i18n="summary">Resumen</h2>
         <div id="summaryBox" class="summary" data-i18n="loading">Cargando…</div>
       </section>
+
+      <section class="panel-section">
+        <h2 data-i18n="verify_heading">¿Es un bulo?</h2>
+        <div class="verify">
+          <input id="verifyInput" class="verify-input" type="text"
+                 data-i18n="verify_ph" data-i18n-attr="placeholder" placeholder="Pega un titular o afirmación…">
+          <button id="verifyBtn" class="btn-ghost" data-i18n="verify_btn">Verificar</button>
+          <div id="verifyOut" class="verify-out"></div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2 data-i18n="alerts_heading">Alertas por zona</h2>
+        <div class="alerts">
+          <p class="alerts-note" data-i18n="alerts_note">Recibe una notificación cuando haya picos de incidentes o temas con bulos recurrentes en tu zona.</p>
+          <label class="chk"><input type="checkbox" id="alertsToggle"> <span data-i18n="alerts_enable">Activar alertas</span></label>
+          <select id="alertsRegion" class="year-select">
+            <option value="global" data-i18n="alerts_global">Global</option>
+            <option value="esp" data-i18n="alerts_esp">España</option>
+            <option value="mar" data-i18n="alerts_mar">Marruecos</option>
+            <option value="med" data-i18n="alerts_med">Mediterráneo</option>
+          </select>
+          <button id="alertsTestBtn" class="btn-ghost" data-i18n="alerts_test">Enviar notificación de prueba</button>
+          <div id="alertsStatus" class="alerts-status"></div>
+        </div>
+      </section>
     </div>
 
     <div id="pane-info" class="hidden">

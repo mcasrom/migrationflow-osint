@@ -101,6 +101,20 @@ def init_db():
             )
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS idx_runs_collector ON collector_runs (collector, started_at DESC)")
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS push_subscriptions (
+                id BIGSERIAL PRIMARY KEY,
+                endpoint TEXT NOT NULL UNIQUE,
+                p256dh TEXT NOT NULL,
+                auth TEXT NOT NULL,
+                region TEXT NOT NULL DEFAULT 'global',
+                lang TEXT NOT NULL DEFAULT 'es',
+                enabled BOOLEAN NOT NULL DEFAULT true,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+            )
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_push_region ON push_subscriptions (region, enabled)")
         conn.commit()
         logger.info("[init_db] esquema listo")
     except Exception as e:
@@ -362,24 +376,29 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
         release_conn(conn)
 
 
-def fetch_summary() -> dict:
+def fetch_summary(year: Optional[int] = None) -> dict:
     conn = get_conn()
+    yw = ""
+    params = []
+    if year:
+        yw = "AND date_part('year', reported_at) = %s"
+        params.append(int(year))
     try:
         cur = conn.cursor()
-        cur.execute("SELECT count(*) FROM events WHERE status='active'")
+        cur.execute(f"SELECT count(*) FROM events WHERE status='active' {yw}", params)
         total = cur.fetchone()[0]
-        cur.execute("SELECT event_type, count(*) FROM events WHERE status='active' GROUP BY 1")
+        cur.execute(f"SELECT event_type, count(*) FROM events WHERE status='active' {yw} GROUP BY 1", params)
         by_type = {r[0]: r[1] for r in cur.fetchall()}
-        cur.execute("SELECT level, count(*) FROM events WHERE status='active' GROUP BY 1")
+        cur.execute(f"SELECT level, count(*) FROM events WHERE status='active' {yw} GROUP BY 1", params)
         by_level = {r[0]: r[1] for r in cur.fetchall()}
-        cur.execute("SELECT count(*) FROM events WHERE status='active' AND value IS NOT NULL")
+        cur.execute(f"SELECT count(*) FROM events WHERE status='active' AND value IS NOT NULL {yw}", params)
         with_value = cur.fetchone()[0]
         cur.execute(
-            "SELECT round(sum(value)::numeric) FROM ("
+            f"SELECT round(sum(value)::numeric) FROM ("
             "SELECT DISTINCT ON (iso3, event_type) value FROM events "
-            "WHERE status='active' AND value IS NOT NULL "
+            f"WHERE status='active' AND value IS NOT NULL {yw} "
             "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
-            "ORDER BY iso3, event_type, reported_at DESC) t")
+            "ORDER BY iso3, event_type, reported_at DESC) t", params)
         sum_value = cur.fetchone()[0]
         return {
             "total_active": total,
@@ -406,5 +425,176 @@ def fetch_status() -> list[dict]:
             r["started_at"] = r["started_at"].isoformat() if r["started_at"] else None
             r["finished_at"] = r["finished_at"].isoformat() if r["finished_at"] else None
         return rows
+    finally:
+        release_conn(conn)
+
+
+# ── Verificador de bulos / contexto ─────────────────────────────────
+
+def search_events(text: str, limit: int = 20) -> list[dict]:
+    """Busca eventos activos cuyo título/descripción contenga los tokens de `text`."""
+    import re as _re
+    tokens = _re.findall(r"[a-zA-Z0-9À-ÿ]{3,}", text or "")
+    if not tokens:
+        return []
+    where, params = [], []
+    for t in tokens:
+        like = f"%{t}%"
+        where.append("(title ILIKE %s OR description ILIKE %s)")
+        params.extend([like, like])
+    sql = f"""
+        SELECT id, event_type, level, title, description, country, iso3,
+               value, lat, lon, reported_at, source
+        FROM events WHERE status='active' AND ({' OR '.join(where)})
+        ORDER BY reported_at DESC NULLS LAST LIMIT %s
+    """
+    params.append(int(limit))
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(sql, params)
+        rows = list(cur.fetchall())
+        for r in rows:
+            r["reported_at"] = r["reported_at"].isoformat() if r["reported_at"] else None
+        return rows
+    finally:
+        release_conn(conn)
+
+
+def last_stock(event_type: str, iso3: str) -> Optional[tuple]:
+    """Último stock (value, fecha año) para un tipo y país."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT value, to_char(reported_at, 'YYYY') FROM events "
+            "WHERE iso3=%s AND status='active' AND event_type=%s AND value IS NOT NULL "
+            "ORDER BY reported_at DESC LIMIT 1", (iso3, event_type))
+        r = cur.fetchone()
+        return (float(r[0]), r[1]) if r else None
+    finally:
+        release_conn(conn)
+
+
+def global_stock(event_type: str) -> Optional[float]:
+    """Último valor agregado (por país, último dato) para un tipo."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT round(sum(value)::numeric) FROM ("
+            "SELECT DISTINCT ON (iso3) value FROM events "
+            "WHERE status='active' AND event_type=%s AND value IS NOT NULL "
+            "ORDER BY iso3, reported_at DESC) t", (event_type,))
+        r = cur.fetchone()
+        return float(r[0]) if r and r[0] is not None else None
+    finally:
+        release_conn(conn)
+
+
+def incident_stats_iso3(iso3s: Optional[set], days: int) -> Optional[dict]:
+    """Estadísticas de incidentes missing (count, muertes) en `days` días."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        params: list = []
+        where = "status='active' AND event_type='missing' AND reported_at >= now() - make_interval(days => %s)"
+        params.append(int(days))
+        if iso3s:
+            where += " AND iso3 = ANY(%s)"
+            params.append(sorted(iso3s))
+        cur.execute(
+            f"SELECT count(*), coalesce(sum(value),0) FROM events WHERE {where}", params)
+        r = cur.fetchone()
+        if not r or not r[0]:
+            return None
+        return {"count": r[0], "deaths": float(r[1])}
+    finally:
+        release_conn(conn)
+
+
+def incident_stats_bbox(bbox: tuple, days: int) -> Optional[dict]:
+    """Estadísticas de incidentes missing dentro de una caja geográfica."""
+    west, south, east, north = bbox
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT count(*), coalesce(sum(value),0) FROM events "
+            "WHERE status='active' AND event_type='missing' "
+            "AND reported_at >= now() - make_interval(days => %s) "
+            "AND geom && ST_MakeEnvelope(%s,%s,%s,%s,4326)::geography",
+            (int(days), west, south, east, north))
+        r = cur.fetchone()
+        if not r or not r[0]:
+            return None
+        return {"count": r[0], "deaths": float(r[1])}
+    finally:
+        release_conn(conn)
+
+
+STOCK_LABELS = {
+    "refugees": {"es": "Refugiados (acogida)", "en": "Refugees hosted"},
+    "asylum": {"es": "Solicitantes de asilo (stock)", "en": "Asylum-seekers (pending)"},
+    "idp": {"es": "Desplazados internos", "en": "Internally displaced"},
+    "displacement": {"es": "Desplazamiento", "en": "Displacement"},
+    "dtm_idp": {"es": "IDP (DTM)", "en": "IDP (DTM)"},
+    "refugees_origin": {"es": "Origen de refugiados", "en": "Refugee origin"},
+}
+
+
+def stock_label(event_type: str, lang: str = "es") -> str:
+    m = STOCK_LABELS.get(event_type)
+    return m[lang] if m else event_type
+
+
+# ── Push notifications ───────────────────────────────────────────────
+
+def push_subscription_upsert(endpoint: str, p256dh: str, auth: str, region: str, lang: str = "es"):
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """INSERT INTO push_subscriptions (endpoint, p256dh, auth, region, lang, enabled)
+               VALUES (%s,%s,%s,%s,%s,true)
+               ON CONFLICT (endpoint) DO UPDATE SET
+                 p256dh=EXCLUDED.p256dh, auth=EXCLUDED.auth, region=EXCLUDED.region,
+                 lang=EXCLUDED.lang, enabled=true, updated_at=now()""",
+            (endpoint, p256dh, auth, region, lang))
+        conn.commit()
+    finally:
+        release_conn(conn)
+
+
+def push_subscription_delete(endpoint: str):
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("UPDATE push_subscriptions SET enabled=false, updated_at=now() WHERE endpoint=%s", (endpoint,))
+        conn.commit()
+    finally:
+        release_conn(conn)
+
+
+def push_subscriptions_for(region: str = "global") -> list[dict]:
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        if region == "global":
+            cur.execute("SELECT endpoint, p256dh, auth, lang FROM push_subscriptions WHERE enabled")
+        else:
+            cur.execute("SELECT endpoint, p256dh, auth, lang FROM push_subscriptions "
+                        "WHERE enabled AND (region=%s OR region='global')", (region,))
+        return list(cur.fetchall())
+    finally:
+        release_conn(conn)
+
+
+def push_subscription_remove(endpoint: str):
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM push_subscriptions WHERE endpoint=%s", (endpoint,))
+        conn.commit()
     finally:
         release_conn(conn)

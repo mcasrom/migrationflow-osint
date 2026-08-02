@@ -93,6 +93,151 @@ function initInstall() {
   });
 }
 
+async function runVerify(q) {
+  const out = document.getElementById("verifyOut");
+  if (!q) return;
+  out.innerHTML = `<div class="v-loading">${t("verify_loading")}</div>`;
+  let data;
+  try {
+    const r = await fetch("/api/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ q, lang: LANG }) });
+    if (!r.ok) { out.innerHTML = ""; return; }
+    data = await r.json();
+  } catch { out.innerHTML = ""; return; }
+  let html = "";
+  if (data.matches && data.matches.length) {
+    html += `<div class="v-sub">${t("verify_matches")}</div>`;
+    for (const m of data.matches) {
+      html += `<div class="v-card v-hit">
+        <b>${esc(m.title[LANG] || m.title.es)}</b>
+        <p>${esc(m.claim[LANG] || m.claim.es)}</p>
+        <p class="v-ev">${esc(m.evidence[LANG] || m.evidence.es)}</p>
+        <div class="v-srcs">${(m.sources || []).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`).join("")}</div>
+      </div>`;
+    }
+  } else {
+    html += `<div class="v-sub">${t("verify_nomatch")}</div>`;
+  }
+  if (data.events && data.events.length) {
+    html += `<div class="v-sub">${t("verify_events")}</div>`;
+    html += data.events.slice(0, 5).map(ev =>
+      `<div class="v-row">${esc(typeLabel(ev.event_type, ev.event_type))} · <b>${esc(String(ev.title || "").slice(0, 60))}</b>${ev.reported_at ? ` · ${fmtDate(ev.reported_at)}` : ""}${ev.value != null ? ` · ${fmt(ev.value)}` : ""}</div>`).join("");
+  }
+  html += `<div class="v-srcs">${(data.links || []).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</div>
+    <div class="v-foot">${t("verify_how")}</div>`;
+  out.innerHTML = html;
+}
+
+function openVerifier(text) {
+  const input = document.getElementById("verifyInput");
+  if (!input) return;
+  document.getElementById("tab-data").click();
+  input.value = text || "";
+  runVerify(input.value.trim());
+}
+
+function initVerifier() {
+  const input = document.getElementById("verifyInput");
+  const btn = document.getElementById("verifyBtn");
+  if (!input || !btn) return;
+  const go = () => runVerify(input.value.trim());
+  btn.addEventListener("click", go);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const output = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; ++i) output[i] = raw.charCodeAt(i);
+  return output;
+}
+
+async function subscribePush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+    const r = await fetch("/api/push/vapid");
+    if (!r.ok) return false;
+    const vapid = await r.json();
+    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid.public_key) });
+  }
+  const region = document.getElementById("alertsRegion").value;
+  await fetch("/api/push/register", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ endpoint: sub.endpoint, keys: sub.toJSON().keys, region, lang: LANG }) });
+  return true;
+}
+
+async function unsubscribePush() {
+  if (!("serviceWorker" in navigator)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await fetch("/api/push/unregister", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: sub.endpoint }) });
+      await sub.unsubscribe();
+    }
+  } catch { }
+}
+
+function initAlerts() {
+  const toggle = document.getElementById("alertsToggle");
+  const region = document.getElementById("alertsRegion");
+  const testBtn = document.getElementById("alertsTestBtn");
+  const status = document.getElementById("alertsStatus");
+  if (!toggle || !region || !testBtn || !status) return;
+  const showStatus = (s, ok) => { status.textContent = s; status.className = "alerts-status " + (ok ? "ok" : "err"); };
+  const regionName = () => t("alerts_" + region.value) || region.value;
+  const saved = localStorage.getItem("mf_alerts");
+  toggle.checked = saved === "1";
+  if (saved === "1" && localStorage.getItem("mf_alerts_region")) {
+    region.value = localStorage.getItem("mf_alerts_region");
+  }
+  const setAlerts = async (on) => {
+    if (!("Notification" in window)) {
+      toggle.checked = false;
+      showStatus(t("alerts_unsupported"), false);
+      return;
+    }
+    try {
+      if (on) {
+        const perm = await Notification.requestPermission();
+        if (perm !== "granted") { toggle.checked = false; showStatus(t("alerts_off"), false); return; }
+        const okSub = await subscribePush();
+        if (!okSub) { toggle.checked = false; showStatus(t("alerts_unsupported"), false); return; }
+        localStorage.setItem("mf_alerts", "1");
+        localStorage.setItem("mf_alerts_region", region.value);
+        showStatus(t("alerts_on").replace("{r}", regionName()), true);
+      } else {
+        await unsubscribePush();
+        localStorage.removeItem("mf_alerts");
+        showStatus(t("alerts_off"), false);
+      }
+    } catch { toggle.checked = !on; showStatus(t("alerts_error"), false); }
+  };
+  toggle.addEventListener("change", () => setAlerts(toggle.checked));
+  region.addEventListener("change", async () => {
+    if (toggle.checked) {
+      try {
+        await subscribePush();
+        localStorage.setItem("mf_alerts_region", region.value);
+        showStatus(t("alerts_on").replace("{r}", regionName()), true);
+      } catch { showStatus(t("alerts_error"), false); }
+    }
+  });
+  testBtn.addEventListener("click", async () => {
+    if (!toggle.checked) { await setAlerts(true); if (!toggle.checked) return; }
+    try {
+      const r = await fetch(`/api/push/test?region=${encodeURIComponent(region.value)}&lang=${LANG}`);
+      const j = await r.json();
+      showStatus(t("alerts_test_sent") + (j.ok > 0 ? "" : " (0)"), j.ok > 0);
+    } catch { showStatus(t("alerts_error"), false); }
+  });
+  if (saved === "1" && toggle.checked) showStatus(t("alerts_on").replace("{r}", regionName()), true);
+}
+
 function initTabs() {
   const switchTab = (name) => {
     document.getElementById("tab-data").classList.toggle("active", name === "data");
@@ -452,6 +597,7 @@ function initControls(eventTypes) {
   document.getElementById("yearFilter").addEventListener("change", e => {
     state.year = e.target.value;
     refreshEvents();
+    refreshSummary();
   });
   document.getElementById("heatToggle").addEventListener("change", e => {
     state.heat = e.target.checked;
@@ -518,6 +664,7 @@ function popupHtml(ev) {
     <div class="val">${fmt(ev.value)}</div>
     <div class="meta">${when} · ${ev.source} · ${ev.country || ev.iso3 || ""}</div>
     ${ev.description ? `<div class="desc">${ev.description.replace(/</g, "&lt;")}</div>` : ""}
+    ${ev.event_type === "news" ? `<span class="ctx-anchor"></span>` : ""}
   </div>`;
 }
 
@@ -533,19 +680,51 @@ function placeEvent(ev) {
     : ""));
   marker.on("mouseover", () => marker.openPopup());
   marker.on("mouseout", () => marker.closePopup());
-  marker.on("popupopen", () => {
+  marker.on("popupopen", async () => {
     const btn = marker.getPopup().getElement()?.querySelector(".popup-btn");
-    if (!btn || btn.dataset.bound) return;
-    btn.dataset.bound = "1";
-    btn.addEventListener("click", async () => {
-      const p = marker.getPopup();
-      p.setContent(`<div class="popup">${t("cp_loading")}</div>`);
-      const data = await loadCountrySummary(btn.dataset.iso3, COUNTRY_SUMMARY_DAYS);
-      if (!data) { p.setContent(`<div class="popup cp-none">${t("cp_error")}</div>`); return; }
-      p.setContent(countryPopupHtml(data));
-      p.update();
-    });
-    L.DomEvent.disableClickPropagation(btn);
+    if (btn && !btn.dataset.bound) {
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", async () => {
+        const p = marker.getPopup();
+        p.setContent(`<div class="popup">${t("cp_loading")}</div>`);
+        const data = await loadCountrySummary(btn.dataset.iso3, COUNTRY_SUMMARY_DAYS);
+        if (!data) { p.setContent(`<div class="popup cp-none">${t("cp_error")}</div>`); return; }
+        p.setContent(countryPopupHtml(data));
+        p.update();
+      });
+      L.DomEvent.disableClickPropagation(btn);
+    }
+    if (ev.event_type === "news" && !marker._ctxAdded) {
+      marker._ctxAdded = true;
+      try {
+        const r = await fetch(`/api/context?q=${encodeURIComponent(ev.title || "")}&lang=${LANG}`);
+        const j = await r.json();
+        const el = marker.getPopup().getElement();
+        const anchor = el?.querySelector(".ctx-anchor");
+        if (j.cards && j.cards.length && anchor) {
+          const ctxHtml = `<div class="ctx">${j.cards.map(c => `<div class="ctx-card">
+            <div class="ctx-card-t">🛡 ${esc(c.label)}</div>
+            ${c.points.map(pt => `<div class="ctx-row"><span>${esc(pt.label)}</span><b>${esc(pt.value)}</b></div>`).join("")}
+            <div class="v-srcs">${(c.sources || []).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`).join("")}</div>
+          </div>`).join("")}
+          <div class="ctx-actions"><a href="#" class="ctx-verify">${t("ctx_verify")}</a></div></div>`;
+          const p = marker.getPopup();
+          const base = String(p.getContent() || "");
+          const ANCHOR = '<span class="ctx-anchor"></span>';
+          if (base.includes(ANCHOR)) {
+            p.setContent(base.replace(ANCHOR, ctxHtml + ANCHOR));
+          } else {
+            anchor.insertAdjacentHTML("beforebegin", ctxHtml);
+            p.update();
+          }
+          const link = marker.getPopup().getElement()?.querySelector(".ctx-verify");
+          if (link) {
+            link.addEventListener("click", (e) => { e.preventDefault(); openVerifier(ev.title); });
+            L.DomEvent.disableClickPropagation(link);
+          }
+        }
+      } catch (e) { window.__ctxErr = String(e && e.message || e); }
+    }
   });
   layer.addLayer(marker);
 }
@@ -578,6 +757,17 @@ async function refreshEvents() {
   }
   applyChoropleth(events);
   document.getElementById("lastUpdate").textContent = `${t("updated")} ${fmtTime(new Date())}`;
+}
+
+async function refreshSummary() {
+  try {
+    const url = state.year ? `/api/summary?year=${state.year}` : "/api/summary";
+    const s = await (await fetch(url)).json();
+    summary = s;
+    document.getElementById("totalBadge").innerHTML =
+      `${fmt(summary.total_active)} <span data-i18n="events">${t("events")}</span>`;
+    updateSummary();
+  } catch { }
 }
 
 async function updateSummary() {
@@ -639,6 +829,8 @@ initIntro();
 initTabs();
 initShare();
 initInstall();
+initVerifier();
+initAlerts();
 populateYears();
 state.dark = (localStorage.getItem("mf_theme") || "dark") === "dark";
 try { initMap(); } catch (e) { console.error("initMap:", e); }
