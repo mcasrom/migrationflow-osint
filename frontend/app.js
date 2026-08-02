@@ -5,11 +5,51 @@ const LEVEL_LABEL = { info: "info", warning: "warning", alert: "alert", critical
 
 const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "refugees_origin", "missing"];
 const TYPE_DEFAULT_HIDDEN = ["refugees_origin"];
+const KOFI_URL = "https://ko-fi.com/migrationflow";
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null;
 let state = { minLevel: "info", heat: false, dark: true };
 const enabledTypes = new Set();
 let summary = null, status = null;
+
+function initTabs() {
+  const switchTab = (name) => {
+    document.getElementById("tab-data").classList.toggle("active", name === "data");
+    document.getElementById("tab-info").classList.toggle("active", name === "info");
+    document.getElementById("pane-data").classList.toggle("hidden", name !== "data");
+    document.getElementById("pane-info").classList.toggle("hidden", name !== "info");
+  };
+  document.getElementById("tab-data").addEventListener("click", () => switchTab("data"));
+  document.getElementById("tab-info").addEventListener("click", () => switchTab("info"));
+  document.getElementById("kofiBtn").href = KOFI_URL;
+  document.getElementById("exportBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    exportGeoJSON();
+  });
+}
+
+async function exportGeoJSON() {
+  try {
+    const r = await fetch("/api/events?limit=5000");
+    const data = await r.json();
+    const feats = data.events.map(ev => ({
+      type: "Feature",
+      properties: {
+        source: ev.source, event_type: ev.event_type, level: ev.level,
+        title: ev.title, value: ev.value, country: ev.country,
+        reported_at: ev.reported_at, source_id: ev.source_id,
+      },
+      geometry: { type: "Point", coordinates: [ev.lon, ev.lat] },
+    }));
+    const blob = new Blob([JSON.stringify({ type: "FeatureCollection", features: feats }, null, 2)],
+      { type: "application/geo+json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "migrationflow_events.geojson";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch { }
+}
 
 function fmt(n) { return (n == null) ? "—" : Number(n).toLocaleString("es-ES"); }
 
@@ -157,7 +197,7 @@ function TYPE_LABEL(t) {
 
 async function updateSources() {
   if (!status) return;
-  const box = document.getElementById("sourcesBox");
+  const box = document.getElementById("sourcesBoxInfo");
   let html = "";
   for (const c of status.collectors || []) {
     const ok = c.success;
@@ -185,5 +225,6 @@ async function loadAll() {
 }
 
 initMap();
+initTabs();
 loadAll();
 setInterval(loadAll, 300000);

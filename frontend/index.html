@@ -26,30 +26,98 @@
   <div id="map"></div>
 
   <aside id="panel">
-    <section class="panel-section">
-      <h2>Categorías</h2>
-      <div id="typeFilters" class="filters"></div>
-      <h2>Nivel mínimo</h2>
-      <div id="levelFilters" class="filters level-filters">
-        <button data-level="info" class="active">Todas</button>
-        <button data-level="warning" class="lvl-warning">Warning</button>
-        <button data-level="alert" class="lvl-alert">Alert</button>
-        <button data-level="critical" class="lvl-critical">Critical</button>
-      </div>
-      <h2>Mapa</h2>
-      <label class="chk"><input type="checkbox" id="heatToggle"> Densidad de incidentes (heatmap)</label>
-      <label class="chk"><input type="checkbox" id="darkToggle" checked> Tema oscuro</label>
-    </section>
+    <div class="tabs">
+      <button id="tab-data" class="tab active">Datos</button>
+      <button id="tab-info" class="tab">Fuentes</button>
+    </div>
 
-    <section class="panel-section">
-      <h2>Resumen</h2>
-      <div id="summaryBox" class="summary">Cargando…</div>
-    </section>
+    <div id="pane-data">
+      <section class="panel-section">
+        <h2>Categorías</h2>
+        <div id="typeFilters" class="filters"></div>
+        <h2>Nivel mínimo</h2>
+        <div id="levelFilters" class="filters level-filters">
+          <button data-level="info" class="active">Todas</button>
+          <button data-level="warning" class="lvl-warning">Warning</button>
+          <button data-level="alert" class="lvl-alert">Alert</button>
+          <button data-level="critical" class="lvl-critical">Critical</button>
+        </div>
+        <h2>Mapa</h2>
+        <label class="chk"><input type="checkbox" id="heatToggle"> Densidad de incidentes (heatmap)</label>
+        <label class="chk"><input type="checkbox" id="darkToggle" checked> Tema oscuro</label>
+      </section>
 
-    <section class="panel-section">
-      <h2>Fuentes</h2>
-      <div id="sourcesBox" class="sources">Cargando…</div>
-    </section>
+      <section class="panel-section">
+        <h2>Resumen</h2>
+        <div id="summaryBox" class="summary">Cargando…</div>
+      </section>
+    </div>
+
+    <div id="pane-info" class="hidden">
+      <section class="panel-section">
+        <h2>Metodología</h2>
+        <ol class="about">
+          <li>Recopilamos automáticamente <b>datos públicos</b> de organismos internacionales y plataformas de datos abiertos.</li>
+          <li>Cada evento se <b>geolocaliza</b> (coordenadas del incidente o centroide del país) y se clasifica por tipo y severidad.</li>
+          <li>La <b>severidad</b> (info · warning · alert · critical) se calcula con umbrales por categoría (p. ej. volumen de desplazados o víctimas).</li>
+          <li>Los eventos <b>expiran automáticamente</b> cuando la fuente deja de reportarlos, manteniendo el mapa actualizado.</li>
+          <li>Todo es reproducible: código abierto, fuentes y criterios documentados.</li>
+        </ol>
+      </section>
+
+      <section class="panel-section">
+        <h2>Fuentes de datos</h2>
+        <div class="src-list">
+          <div class="src-item">
+            <b>UNHCR Refugee Data Finder</b> — stock de refugiados, solicitantes de asilo y desplazados internos por país. API pública anual.
+            <a href="https://api.unhcr.org/population/v1" target="_blank" rel="noopener">api.unhcr.org</a>
+          </div>
+          <div class="src-item">
+            <b>IDMC</b> — desplazamiento interno por conflicto y violencia, vía API de UNHCR. Datos anuales.
+            <a href="https://www.internal-displacement.org" target="_blank" rel="noopener">internal-displacement.org</a>
+          </div>
+          <div class="src-item">
+            <b>IOM DTM</b> — stock de desplazados internos por operación y país (CSV global semanal).
+            <a href="https://dtm.iom.int" target="_blank" rel="noopener">dtm.iom.int</a>
+          </div>
+          <div class="src-item">
+            <b>Missing Migrants Project (IOM)</b> — incidentes con muertos y desaparecidos en rutas migratorias, con coordenadas (CSV).
+            <a href="https://missingmigrants.iom.int" target="_blank" rel="noopener">missingmigrants.iom.int</a>
+          </div>
+          <div class="src-item">
+            Distribución: <b>HDX (Humanitarian Data Exchange)</b> · <a href="https://data.humdata.org" target="_blank" rel="noopener">data.humdata.org</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2>Estado de fuentes</h2>
+        <div id="sourcesBoxInfo" class="sources">Cargando…</div>
+      </section>
+
+      <section class="panel-section">
+        <h2>Contacto y apoyo</h2>
+        <p class="contact">¿Dudas, sugerencias o una corrección de datos? Escríbenos:</p>
+        <p><a class="mailto" href="mailto:migrationflow@viajeinteligencia.com">migrationflow@viajeinteligencia.com</a></p>
+        <p>Este proyecto es abierto y sin ánimo de lucro. Si te resulta útil, puedes apoyar su mantenimiento:</p>
+        <a id="kofiBtn" class="kofi" href="https://ko-fi.com/migrationflow" target="_blank" rel="noopener">Apoyar en Ko-fi ☕</a>
+        <div class="links">
+          <a href="https://github.com/mcasrom/migrationflow-osint" target="_blank" rel="noopener">Código fuente (GitHub)</a>
+          <a href="/docs" target="_blank" rel="noopener">Documentación de la API</a>
+          <a href="#" id="exportBtn">Exportar GeoJSON</a>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <h2>Aviso legal</h2>
+        <p class="legal">
+          MigrationFlow OSINT es una <b>recopilación independiente de datos públicos</b> con fines informativos y de análisis.
+          No está afiliado, respaldado ni patrocinado por UNHCR, IDMC, IOM ni HDX. Las cifras son <b>estimaciones oficiales</b>
+          de las fuentes citadas y pueden estar sujetas a revisión. Los eventos que se muestran no constituyen una clasificación
+          oficial de crisis ni sustituyen la información de las agencias humanitarias.
+        </p>
+      </section>
+    </div>
 
     <footer class="foot">
       Datos: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX
