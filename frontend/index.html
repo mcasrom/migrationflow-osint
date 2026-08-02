@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
+<meta name="description" content="Seguimiento abierto de flujos migratorios y desplazamiento forzado a partir de datos públicos de UNHCR, IDMC, IOM y ReliefWeb.">
 <title>MigrationFlow OSINT</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -15,10 +16,11 @@
 <body>
 <header>
   <h1>MigrationFlow <span>OSINT</span></h1>
-  <div class="sub">Flujos migratorios y desplazamiento forzado a escala global</div>
+  <div class="sub" data-i18n="sub">Flujos migratorios y desplazamiento forzado a escala global</div>
   <div class="status-row">
     <span id="lastUpdate" class="badge">—</span>
-    <span id="totalBadge" class="badge">0 eventos</span>
+    <span id="totalBadge" class="badge">0 <span data-i18n="events">eventos</span></span>
+    <button id="langToggle" class="badge lang" title="Idioma / Language">EN</button>
   </div>
 </header>
 
@@ -27,46 +29,51 @@
 
   <aside id="panel">
     <div class="tabs">
-      <button id="tab-data" class="tab active">Datos</button>
-      <button id="tab-info" class="tab">Fuentes</button>
+      <button id="tab-data" class="tab active" data-i18n="tab_data">Datos</button>
+      <button id="tab-info" class="tab" data-i18n="tab_info">Fuentes</button>
     </div>
 
     <div id="pane-data">
       <section class="panel-section">
-        <h2>Categorías</h2>
+        <h2 data-i18n="cat">Categorías</h2>
         <div id="typeFilters" class="filters"></div>
-        <h2>Nivel mínimo</h2>
+        <h2 data-i18n="min_level">Nivel mínimo</h2>
         <div id="levelFilters" class="filters level-filters">
-          <button data-level="info" class="active">Todas</button>
+          <button data-level="info" class="active" data-i18n="level_all">Todas</button>
           <button data-level="warning" class="lvl-warning">Warning</button>
           <button data-level="alert" class="lvl-alert">Alert</button>
           <button data-level="critical" class="lvl-critical">Critical</button>
         </div>
-        <h2>Mapa</h2>
-        <label class="chk"><input type="checkbox" id="heatToggle"> Densidad de incidentes (heatmap)</label>
-        <label class="chk"><input type="checkbox" id="darkToggle" checked> Tema oscuro</label>
+        <h2 data-i18n="year_label">Año (comparativa temporal)</h2>
+        <select id="yearFilter" class="year-select">
+          <option value="">Todos los años</option>
+        </select>
+        <h2 data-i18n="map_section">Mapa</h2>
+        <label class="chk"><input type="checkbox" id="heatToggle"> <span data-i18n="heat">Densidad de incidentes (heatmap)</span></label>
+        <label class="chk"><input type="checkbox" id="darkToggle" checked> <span data-i18n="dark">Tema oscuro</span></label>
+        <label class="chk"><input type="checkbox" id="routesToggle"> <span data-i18n="routes">Rutas migratorias (aprox.)</span></label>
       </section>
 
       <section class="panel-section">
-        <h2>Resumen</h2>
-        <div id="summaryBox" class="summary">Cargando…</div>
+        <h2 data-i18n="summary">Resumen</h2>
+        <div id="summaryBox" class="summary" data-i18n="loading">Cargando…</div>
       </section>
     </div>
 
     <div id="pane-info" class="hidden">
       <section class="panel-section">
-        <h2>Metodología</h2>
+        <h2 data-i18n="m_heading">Metodología</h2>
         <ol class="about">
-          <li>Recopilamos automáticamente <b>datos públicos</b> de organismos internacionales y plataformas de datos abiertos.</li>
-          <li>Cada evento se <b>geolocaliza</b> (coordenadas del incidente o centroide del país) y se clasifica por tipo y severidad.</li>
-          <li>La <b>severidad</b> (info · warning · alert · critical) se calcula con umbrales por categoría (p. ej. volumen de desplazados o víctimas).</li>
-          <li>Los eventos <b>expiran automáticamente</b> cuando la fuente deja de reportarlos, manteniendo el mapa actualizado.</li>
-          <li>Todo es reproducible: código abierto, fuentes y criterios documentados.</li>
+          <li data-i18n-html="m1">Recopilamos automáticamente <b>datos públicos</b> de organismos internacionales y plataformas de datos abiertos.</li>
+          <li data-i18n-html="m2">Cada evento se <b>geolocaliza</b> (coordenadas del incidente o centroide del país) y se clasifica por tipo y severidad.</li>
+          <li data-i18n-html="m3">La <b>severidad</b> (info · warning · alert · critical) se calcula con umbrales por categoría (p. ej. volumen de desplazados o víctimas).</li>
+          <li data-i18n-html="m4">Los eventos <b>expiran automáticamente</b> cuando la fuente deja de reportarlos, manteniendo el mapa actualizado.</li>
+          <li data-i18n-html="m5">Todo es reproducible: código abierto, fuentes y criterios documentados.</li>
         </ol>
       </section>
 
       <section class="panel-section">
-        <h2>Fuentes de datos</h2>
+        <h2 data-i18n="sources_heading">Fuentes de datos</h2>
         <div class="src-list">
           <div class="src-item">
             <b>UNHCR Refugee Data Finder</b> — stock de refugiados, solicitantes de asilo y desplazados internos por país. API pública anual.
@@ -85,33 +92,37 @@
             <a href="https://missingmigrants.iom.int" target="_blank" rel="noopener">missingmigrants.iom.int</a>
           </div>
           <div class="src-item">
+            <b>ReliefWeb</b> — noticias y alertas humanitarias (RSS).
+            <a href="https://reliefweb.int" target="_blank" rel="noopener">reliefweb.int</a>
+          </div>
+          <div class="src-item">
             Distribución: <b>HDX (Humanitarian Data Exchange)</b> · <a href="https://data.humdata.org" target="_blank" rel="noopener">data.humdata.org</a>
           </div>
         </div>
       </section>
 
       <section class="panel-section">
-        <h2>Estado de fuentes</h2>
-        <div id="sourcesBoxInfo" class="sources">Cargando…</div>
+        <h2 data-i18n="sources_status">Estado de fuentes</h2>
+        <div id="sourcesBoxInfo" class="sources" data-i18n="loading">Cargando…</div>
       </section>
 
       <section class="panel-section">
-        <h2>Contacto y apoyo</h2>
-        <p class="contact">¿Dudas, sugerencias o una corrección de datos? Escríbenos:</p>
+        <h2 data-i18n="contact">Contacto y apoyo</h2>
+        <p class="contact" data-i18n="contact_lead">¿Dudas, sugerencias o una corrección de datos? Escríbenos:</p>
         <p><a class="mailto" href="mailto:migrationflow@viajeinteligencia.com">migrationflow@viajeinteligencia.com</a></p>
         <p>Este proyecto es abierto y sin ánimo de lucro. Si te resulta útil, puedes apoyar su mantenimiento:</p>
-        <a id="kofiBtn" class="kofi" href="https://ko-fi.com/migrationflow" target="_blank" rel="noopener">Apoyar en Ko-fi ☕</a>
+        <a id="kofiBtn" class="kofi" href="https://ko-fi.com/m_castillo" target="_blank" rel="noopener"><span data-i18n="koofi">Apoyar en Ko-fi ☕</span></a>
         <div class="links">
-          <a href="https://github.com/mcasrom/migrationflow-osint" target="_blank" rel="noopener">Código fuente (GitHub)</a>
-          <a href="/docs" target="_blank" rel="noopener">Documentación de la API</a>
-          <a href="#" id="exportBtn">Exportar GeoJSON</a>
-          <a href="#" id="exportCsvBtn">Exportar CSV</a>
+          <a href="https://github.com/mcasrom/migrationflow-osint" target="_blank" rel="noopener" data-i18n="github">Código fuente (GitHub)</a>
+          <a href="/docs" target="_blank" rel="noopener" data-i18n="api_docs">Documentación de la API</a>
+          <a href="#" id="exportBtn" data-i18n="exp_geojson">Exportar GeoJSON</a>
+          <a href="#" id="exportCsvBtn" data-i18n="exp_csv">Exportar CSV</a>
         </div>
       </section>
 
       <section class="panel-section">
-        <h2>Aviso legal</h2>
-        <p class="legal">
+        <h2 data-i18n="legal_heading">Aviso legal</h2>
+        <p class="legal" data-i18n-html="legal">
           MigrationFlow OSINT es una <b>recopilación independiente de datos públicos</b> con fines informativos y de análisis.
           No está afiliado, respaldado ni patrocinado por UNHCR, IDMC, IOM ni HDX. Las cifras son <b>estimaciones oficiales</b>
           de las fuentes citadas y pueden estar sujetas a revisión. Los eventos que se muestran no constituyen una clasificación
@@ -120,15 +131,39 @@
       </section>
     </div>
 
-    <footer class="foot">
-      Datos: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX
+    <footer class="foot" data-i18n="footer">
+      Datos: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX · ReliefWeb
     </footer>
   </aside>
 </main>
 
+<div id="intro" class="intro">
+  <div class="intro-card">
+    <button id="introClose" class="intro-close" aria-label="Cerrar" title="Cerrar">×</button>
+    <h2 data-i18n="intro_title">El mundo en movimiento, en un mapa</h2>
+    <p class="intro-lead" data-i18n="intro_lead">Seguimiento abierto de flujos migratorios y desplazamiento forzado a partir de datos públicos de UNHCR, IDMC, IOM y ReliefWeb. Cada punto es un evento real, actualizado de forma automática.</p>
+    <div id="introStats" class="intro-stats"></div>
+    <h3 data-i18n="intro_who">Para quién</h3>
+    <ul class="intro-list">
+      <li data-i18n="who1">Investigadores, periodistas y organizaciones humanitarias</li>
+      <li data-i18n="who2">Comunidades y personas en movimiento</li>
+      <li data-i18n="who3">Ciudadanía interesada en el fenómeno migratorio</li>
+    </ul>
+    <h3 data-i18n="intro_method">Cómo se construye</h3>
+    <p class="intro-method" data-i18n="intro_method_body">Recopilación automática de fuentes oficiales, geolocalización, clasificación por severidad, expiración automática y documentación reproducible.</p>
+    <div class="intro-cta">
+      <button id="introGo" class="btn-primary" data-i18n="intro_go">Explorar el mapa</button>
+      <a href="#" id="introSources" class="intro-link" data-i18n="intro_sources">Ver fuentes y metodología</a>
+    </div>
+    <p class="intro-foot" data-i18n="intro_foot">Datos abiertos · Código abierto · Sin ánimo de lucro</p>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="i18n.js"></script>
+<script src="routes.js"></script>
 <script src="app.js"></script>
 <a href="https://ko-fi.com/m_castillo" target="_blank" rel="noopener noreferrer" class="kofi-fixed" id="kofiFloat" title="Apoyar el proyecto"></a>
 </body>

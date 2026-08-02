@@ -49,6 +49,7 @@ def api_events(
     min_level: Optional[str] = Query(None),
     max_age_days: Optional[int] = Query(None),
     bbox: Optional[str] = Query(None, description="oeste,sur,este,norte"),
+    year: Optional[int] = Query(None, description="Año del dato (p. ej. 2024)"),
     limit: int = Query(1500, le=5000),
 ):
     type_list = [t.strip() for t in types.split(",")] if types else None
@@ -61,7 +62,8 @@ def api_events(
             except ValueError:
                 bbox_tuple = None
     rows = fetch_events(types=type_list, min_level=min_level,
-                        max_age_days=max_age_days, bbox=bbox_tuple, limit=limit)
+                        max_age_days=max_age_days, bbox=bbox_tuple,
+                        year=year, limit=limit)
     return {"total": len(rows), "events": rows}
 
 

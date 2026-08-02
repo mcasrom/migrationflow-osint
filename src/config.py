@@ -35,6 +35,15 @@ HDX_MMP_URL = ("https://data.humdata.org/dataset/fc59785a-31d2-4018-aac7-6b9f619
                "resource/99078436-9c4a-473b-a073-428304a9cf8a/"
                "download/iom-missing-migrants-project-data.csv")
 
+# ── Noticias (ReliefWeb RSS, público sin appname) ────────────
+RELIEFWEB_RSS = "https://reliefweb.int/updates/rss.xml"
+NEWS_KEYWORDS = [
+    "migration", "refugee", "refugees", "displacement", "displaced",
+    "asylum", "asylee", "returnee", "returnees", "internally displaced",
+    "idp", "border", "crossing", "deportation", "remigration", "diaspora",
+]
+NEWS_MAX_ITEMS = 20
+
 # ── Event types (label en español para la UI) ────────────────
 EVENT_TYPES = {
     "refugees": "Refugiados (acogida)",
@@ -44,10 +53,12 @@ EVENT_TYPES = {
     "displacement": "Desplazamiento por conflicto (IDMC)",
     "dtm_idp": "Stock IDP (IOM DTM)",
     "missing": "Muertos y desaparecidos en migración",
+    "news": "Noticias y alertas humanitarias",
 }
 
 STOCK_TYPES = {"refugees", "asylum", "refugees_origin", "idp", "displacement", "dtm_idp"}
 INCIDENT_TYPES = {"missing"}
+NEWS_TYPES = {"news"}
 
 # ── Minimum value to store (evita ruido) ─────────────────────
 MIN_VALUE = {
@@ -69,6 +80,7 @@ SEVERITY_THRESHOLDS = {
     "displacement": (100_000, 500_000, 2_000_000),
     "dtm_idp": (50_000, 300_000, 1_000_000),
     "missing": (1, 10, 100),
+    "news": (0, 0, 0),
 }
 
 # ── TTL en días por fuente (eventos expiran solos) ───────────
@@ -77,6 +89,7 @@ SOURCE_TTL_DAYS = {
     "idmc": 420,
     "iom_dtm": 60,             # rondas semanales
     "missing_migrants": 365,
+    "news": 14,                # noticias: caducan en 2 semanas
 }
 
 # ── Retención para incidentes ────────────────────────────────

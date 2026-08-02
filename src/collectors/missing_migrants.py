@@ -85,7 +85,7 @@ class MissingMigrantsCollector(BaseCollector):
                 cause = row.get("cause_death") or "Causa no especificada"
                 src_name = row.get("information_source") or ""
                 url = row.get("url") or ""
-                expires = (date + timedelta(days=365)).isoformat()
+                expires = (date + timedelta(days=MMP_RETENTION_MONTHS * 30)).isoformat()
                 desc = (f"{fmt_int(total)} personas: {fmt_int(dead)} muertas, {fmt_int(missing)} desaparecidas. "
                         f"\nFecha: {date_s}. Causa: {cause}."
                         + (f"\nRuta: {route}." if route else "")

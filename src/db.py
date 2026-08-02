@@ -246,7 +246,7 @@ def record_run_end(run_id: int, success: bool, created: int, updated: int, error
 
 def fetch_events(types: Optional[list] = None, min_level: Optional[str] = None,
                  max_age_days: Optional[int] = None, bbox: Optional[tuple] = None,
-                 limit: int = 1000) -> list[dict]:
+                 year: Optional[int] = None, limit: int = 1000) -> list[dict]:
     """Consulta eventos activos con filtros opcionales."""
     where = ["status = 'active'"]
     params: list = []
@@ -261,6 +261,9 @@ def fetch_events(types: Optional[list] = None, min_level: Optional[str] = None,
     if max_age_days:
         where.append("reported_at >= now() - make_interval(days => %s)")
         params.append(int(max_age_days))
+    if year:
+        where.append("date_part('year', reported_at) = %s")
+        params.append(int(year))
     if bbox:
         west, south, east, north = bbox
         where.append("geom && ST_MakeEnvelope(%s, %s, %s, %s, 4326)::geography")

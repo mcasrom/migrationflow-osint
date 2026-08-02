@@ -1,0 +1,162 @@
+/* MigrationFlow OSINT — i18n ES/EN */
+const I18N = {
+  es: {
+    sub: "Flujos migratorios y desplazamiento forzado a escala global",
+    events: "eventos",
+    tab_data: "Datos",
+    tab_info: "Fuentes",
+    cat: "Categorías",
+    min_level: "Nivel mínimo",
+    level_all: "Todas",
+    map_section: "Mapa",
+    heat: "Densidad de incidentes (heatmap)",
+    dark: "Tema oscuro",
+    year_label: "Año (comparativa temporal)",
+    year_all: "Todos los años",
+    routes: "Rutas migratorias (aprox.)",
+    summary: "Resumen",
+    loading: "Cargando…",
+    updated: "Actualizado",
+    m_heading: "Metodología",
+    m1: "Recopilamos automáticamente <b>datos públicos</b> de organismos internacionales y plataformas de datos abiertos.",
+    m2: "Cada evento se <b>geolocaliza</b> (coordenadas del incidente o centroide del país) y se clasifica por tipo y severidad.",
+    m3: "La <b>severidad</b> (info · warning · alert · critical) se calcula con umbrales por categoría (p. ej. volumen de desplazados o víctimas).",
+    m4: "Los eventos <b>expiran automáticamente</b> cuando la fuente deja de reportarlos, manteniendo el mapa actualizado.",
+    m5: "Todo es reproducible: código abierto, fuentes y criterios documentados.",
+    sources_heading: "Fuentes de datos",
+    sources_status: "Estado de fuentes",
+    contact: "Contacto y apoyo",
+    contact_lead: "¿Dudas, sugerencias o una corrección de datos? Escríbenos:",
+    koofi: "Apoyar en Ko-fi ☕",
+    github: "Código fuente (GitHub)",
+    api_docs: "Documentación de la API",
+    exp_geojson: "Exportar GeoJSON",
+    exp_csv: "Exportar CSV",
+    legal_heading: "Aviso legal",
+    legal: "MigrationFlow OSINT es una <b>recopilación independiente de datos públicos</b> con fines informativos y de análisis. No está afiliado, respaldado ni patrocinado por UNHCR, IDMC, IOM ni HDX. Las cifras son <b>estimaciones oficiales</b> de las fuentes citadas y pueden estar sujetas a revisión. Los eventos que se muestran no constituyen una clasificación oficial de crisis ni sustituyen la información de las agencias humanitarias.",
+    footer: "Datos: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX · ReliefWeb",
+    intro_title: "El mundo en movimiento, en un mapa",
+    intro_lead: "Seguimiento abierto de flujos migratorios y desplazamiento forzado a partir de datos públicos de UNHCR, IDMC, IOM y ReliefWeb. Cada punto es un evento real, actualizado de forma automática.",
+    intro_who: "Para quién",
+    who1: "Investigadores, periodistas y organizaciones humanitarias",
+    who2: "Comunidades y personas en movimiento",
+    who3: "Ciudadanía interesada en el fenómeno migratorio",
+    intro_method: "Cómo se construye",
+    intro_method_body: "Recopilación automática de fuentes oficiales, geolocalización, clasificación por severidad, expiración automática y documentación reproducible.",
+    intro_go: "Explorar el mapa",
+    intro_sources: "Ver fuentes y metodología",
+    intro_foot: "Datos abiertos · Código abierto · Sin ánimo de lucro",
+    intro_close: "Cerrar",
+    t_error: "error",
+    t_no_runs: "Sin ejecuciones todavía",
+    lvl_info: "Informativo",
+    lvl_warning: "Advertencia",
+    lvl_alert: "Alerta",
+    lvl_critical: "Crítico",
+    no_total: "Total activos",
+    st_events: "Eventos activos",
+    st_sources: "Fuentes activas",
+    st_people: "Personas afectadas",
+  },
+  en: {
+    sub: "Migration flows and forced displacement at a global scale",
+    events: "events",
+    tab_data: "Data",
+    tab_info: "Sources",
+    cat: "Categories",
+    min_level: "Minimum level",
+    level_all: "All",
+    map_section: "Map",
+    heat: "Incident density (heatmap)",
+    dark: "Dark theme",
+    year_label: "Year (temporal comparison)",
+    year_all: "All years",
+    routes: "Migration routes (approx.)",
+    summary: "Summary",
+    loading: "Loading…",
+    updated: "Updated",
+    m_heading: "Methodology",
+    m1: "We automatically collect <b>public data</b> from international agencies and open-data platforms.",
+    m2: "Each event is <b>geolocated</b> (incident coordinates or country centroid) and classified by type and severity.",
+    m3: "<b>Severity</b> (info · warning · alert · critical) is computed with per-category thresholds (e.g. volume of displaced people or victims).",
+    m4: "Events <b>expire automatically</b> when the source stops reporting them, keeping the map up to date.",
+    m5: "Everything is reproducible: open source, sources and criteria documented.",
+    sources_heading: "Data sources",
+    sources_status: "Source status",
+    contact: "Contact & support",
+    contact_lead: "Questions, suggestions or a data correction? Write us:",
+    koofi: "Support on Ko-fi ☕",
+    github: "Source code (GitHub)",
+    api_docs: "API documentation",
+    exp_geojson: "Export GeoJSON",
+    exp_csv: "Export CSV",
+    legal_heading: "Legal notice",
+    legal: "MigrationFlow OSINT is an <b>independent compilation of public data</b> for informational and analytical purposes. It is not affiliated with, endorsed or sponsored by UNHCR, IDMC, IOM or HDX. Figures are <b>official estimates</b> from the cited sources and may be subject to revision. The events shown do not constitute an official crisis classification and do not replace information from humanitarian agencies.",
+    footer: "Data: UNHCR · IDMC · IOM DTM · Missing Migrants Project · HDX · ReliefWeb",
+    intro_title: "The world on the move, on one map",
+    intro_lead: "Open tracking of migration flows and forced displacement from public data by UNHCR, IDMC, IOM and ReliefWeb. Every point is a real event, updated automatically.",
+    intro_who: "Who is it for",
+    who1: "Researchers, journalists and humanitarian organizations",
+    who2: "Communities and people on the move",
+    who3: "Citizens interested in the migration phenomenon",
+    intro_method: "How it's built",
+    intro_method_body: "Automatic collection from official sources, geolocation, severity classification, automatic expiry and reproducible documentation.",
+    intro_go: "Explore the map",
+    intro_sources: "View sources & methodology",
+    intro_foot: "Open data · Open source · Non-profit",
+    intro_close: "Close",
+    t_error: "error",
+    t_no_runs: "No runs yet",
+    lvl_info: "Info",
+    lvl_warning: "Warning",
+    lvl_alert: "Alert",
+    lvl_critical: "Critical",
+    no_total: "Total active",
+    st_events: "Active events",
+    st_sources: "Active sources",
+    st_people: "People affected",
+  },
+};
+
+const TYPE_I18N = {
+  refugees: { es: "Refugiados", en: "Refugees" },
+  asylum: { es: "Solicitudes de asilo", en: "Asylum applications" },
+  idp: { es: "Desplazados internos", en: "Internally displaced" },
+  displacement: { es: "Desplazamiento", en: "Displacement" },
+  dtm_idp: { es: "IDP (DTM)", en: "IDP (DTM)" },
+  refugees_origin: { es: "Origen de refugiados", en: "Refugee origin" },
+  missing: { es: "Muertes en rutas", en: "Missing migrants" },
+  news: { es: "Noticias y alertas", en: "News & alerts" },
+};
+
+const LEVEL_LABEL_I18N = {
+  es: { info: "Informativo", warning: "Advertencia", alert: "Alerta", critical: "Crítico" },
+  en: { info: "Info", warning: "Warning", alert: "Alert", critical: "Critical" },
+};
+
+let LANG = localStorage.getItem("mf_lang") ||
+  ((navigator.language || "es").toLowerCase().startsWith("en") ? "en" : "es");
+
+function t(key) {
+  return (I18N[LANG] && I18N[LANG][key]) || I18N.es[key] || key;
+}
+
+function typeLabel(type, fallback) {
+  if (TYPE_I18N[type] && TYPE_I18N[type][LANG]) return TYPE_I18N[type][LANG];
+  return fallback || type;
+}
+
+function levelLabel(lvl) {
+  return (LEVEL_LABEL_I18N[LANG] && LEVEL_LABEL_I18N[LANG][lvl]) || lvl;
+}
+
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (el.dataset.i18nAttr) { el.setAttribute(el.dataset.i18nAttr, t(el.dataset.i18n)); }
+    else if (el.dataset.i18nHtml) { el.innerHTML = t(el.dataset.i18nHtml); }
+    else { el.textContent = t(el.dataset.i18n); }
+  });
+  const langBtn = document.getElementById("langToggle");
+  if (langBtn) langBtn.textContent = LANG === "es" ? "EN" : "ES";
+}
