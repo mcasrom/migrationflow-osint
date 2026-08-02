@@ -1,5 +1,5 @@
-const CACHE = "migrationflow-v9";
-const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg"];
+const CACHE = "migrationflow-v10";
+const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));

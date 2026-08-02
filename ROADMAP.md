@@ -86,7 +86,8 @@ Priorizada (P1 = mayor valor/esfuerzo).
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
 - [ ] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa.
 - [ ] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa.
-- [ ] Open Graph / meta description completas para compartir en redes.
+- [x] Open Graph / meta description completas para compartir en redes (`og.png` 1200×630 + Twitter card;
+      preview de icono y RRSS en `/preview.html`, no indexado).
 
 ### P3 — Calidad y automatización
 - [ ] Tests automatizados (unittest de `src.db`, `countries`, colectores con fixtures).

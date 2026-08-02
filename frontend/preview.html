@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MigrationFlow OSINT — Preview de icono y RRSS</title>
+<style>
+  :root { --bg:#0b1220; --panel:#111a2e; --panel-2:#16223c; --text:#e8eefb; --muted:#aab8d4; --line:#22314f; --accent:#38bdf8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", Helvetica, Arial, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1 { font-size: 20px; color: var(--accent); }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 40px 0 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+  .icons { display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap; }
+  .ic { text-align: center; }
+  .ic img { display: block; border-radius: 14%; background: var(--panel-2); padding: 6px; margin-bottom: 6px; }
+  .ic span { font-size: 11px; color: var(--muted); }
+  .og-wrap { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+  .og-wrap img { width: 100%; display: block; }
+  p.dim { font-size: 11px; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>MigrationFlow OSINT — preview</h1>
+  <p style="font-size:13px;color:var(--muted)">Página interna de revisión de los activos gráficos (no indexada).</p>
+
+  <h2>Icono (favicon / PWA)</h2>
+  <div class="card">
+    <div class="icons">
+      <div class="ic"><img src="favicon-32.png" width="32" height="32" alt="favicon 32"><span>favicon 32px</span></div>
+      <div class="ic"><img src="icon-192.png" width="80" height="80" alt="icon 192"><span>PWA 192px</span></div>
+      <div class="ic"><img src="icon-512.png" width="120" height="120" alt="icon 512"><span>PWA 512px</span></div>
+      <div class="ic"><img src="apple-touch-icon.png" width="120" height="120" alt="apple touch"><span>Apple touch 512px</span></div>
+    </div>
+  </div>
+
+  <h2>Preview RRSS (Open Graph)</h2>
+  <div class="card">
+    <div class="og-wrap"><img src="og.png" alt="MigrationFlow OSINT — imagen para redes sociales"></div>
+    <p class="dim">og.png · 1200 × 630 px · RGB · se comparte en WhatsApp, X/Twitter, Facebook, LinkedIn, Telegram.</p>
+  </div>
+</main>
+</body>
+</html>
