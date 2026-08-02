@@ -61,6 +61,18 @@ header .sub { font-size: 11px; color: var(--muted); }
 .links a { color: var(--accent); text-decoration: none; }
 .links a:hover { text-decoration: underline; }
 .legal { font-size: 11px; line-height: 1.6; color: var(--muted); }
+
+.kofi-fixed {
+  position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+  background: #ff5e5b; color: #fff; padding: 10px 18px; border-radius: 24px;
+  font-size: 14px; font-weight: bold; text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity .5s, transform .5s;
+}
+.kofi-fixed:hover { transform: scale(1.05); }
+.kofi-fixed.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .panel-section h2 {
   font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
   color: var(--muted); margin: 12px 0 8px;

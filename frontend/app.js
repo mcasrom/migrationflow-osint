@@ -56,6 +56,20 @@ async function exportCSV() {
   } catch { }
 }
 
+function initKofi() {
+  const btn = document.getElementById("kofiFloat");
+  btn.href = KOFI_URL;
+  let count = parseInt(localStorage.getItem("mf_kofi_loads") || "0");
+  count += 1;
+  localStorage.setItem("mf_kofi_loads", String(count));
+  if (count >= 2) {
+    btn.classList.add("show");
+    const msgs = ["☕ Invítame un café", "❤️ Apoya el proyecto",
+      "☕ ¿Útil? Invítame un café", "🍺 Invítame una cerveza"];
+    btn.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  }
+}
+
 async function exportGeoJSON() {
   try {
     const r = await fetch("/api/events?limit=5000");
@@ -254,5 +268,6 @@ async function loadAll() {
 
 initMap();
 initTabs();
+initKofi();
 loadAll();
 setInterval(loadAll, 300000);
