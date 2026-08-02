@@ -31,6 +31,8 @@ Todas **públicas y sin autenticación**.
 | IDMC vía UNHCR | desplazamiento interno por conflicto | `api.unhcr.org/population/v1/idmc/` | anual |
 | IOM DTM (HDX) | stock de IDP por país | CSV semanal en `data.humdata.org` | semanal |
 | Missing Migrants Project (HDX) | incidentes con muertos/desaparecidos (coordenadas) | CSV en `data.humdata.org` | semanal |
+| Frontex | entradas irregulares anuales por país y mensuales por ruta | ArcGIS REST `services9.arcgis.com/dujMioKFm7jZpirQ/.../DetectionsOfIBCs` | semanal (detecciones, no personas únicas) |
+| Caminando Fronteras | víctimas mortales en rutas hacia España (curado) | RSS `caminandofronteras.org/search/monitoreo/feed/rss2/` | cada informe (override en `data/cf_override.json`) |
 | ReliefWeb | noticias y alertas humanitarias | RSS `reliefweb.int/updates/rss.xml` | diaria |
 
 ## Arquitectura
@@ -47,6 +49,8 @@ src/
     idmc.py            desplazamiento por conflicto
     iom_dtm.py         stock IDP por país (CSV semanal)
     missing_migrants.py incidentes con coordenadas (CSV)
+    frontex.py          entradas irregulares (anual por país, mensual por ruta)
+    caminando_fronteras.py víctimas en rutas hacia España (RSS + parse curado)
     news.py            noticias ReliefWeb (RSS + geolocalización)
     countries.py       centroides y resolución ISO3 (data/countries_geo.json)
 server.py              FastAPI + frontend estático
@@ -70,7 +74,11 @@ data/countries_geo.json  centroides ISO3 (250 países)
 |---|---|
 | `/api/events?types=&min_level=&max_age_days=&bbox=&year=&limit=` | eventos activos (filtros combinables) |
 | `/api/summary` | totales por tipo, nivel y suma de valor |
+| `/api/country/{iso3}?days=` | resumen por país (stocks, entradas Frontex, actividad) |
+| `/api/context?q=&lang=` | tarjetas de contexto (cruza bulos + datos reales) para un claim |
+| `/api/verify` (POST `{q, lang}`) | verificador de bulos: matches curados + eventos reales + fact-checkers |
 | `/api/status` | estado por colector + tipos de evento |
+| `/api/push/*` | suscripción/alta VAPID para notificaciones push |
 | `/health` | healthcheck |
 | `/docs` | OpenAPI interactivo |
 
@@ -78,6 +86,12 @@ Ejemplo:
 ```bash
 # Incidentes de 2024 de nivel alert o superior, en Centroamérica
 curl "https://migrationflow.viajeinteligencia.com/api/events?min_level=alert&year=2024&bbox=-92,7,-77,18"
+
+# Entradas irregulares (Frontex) y stocks para Afganistán
+curl "https://migrationflow.viajeinteligencia.com/api/country/AFG?days=365"
+
+# Tarjeta de contexto para una frase
+curl "https://migrationflow.viajeinteligencia.com/api/context?q=patera%20naufragio"
 ```
 
 ## Despliegue (VPS, opción PM2)
@@ -115,5 +129,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 ## Licencia
 
-Open source. Los datos pertenecen a sus fuentes (© UNHCR, IDMC, IOM, HDX, ReliefWeb);
-este proyecto es una recopilación independiente con fines informativos y de análisis.
+Open source. Los datos pertenecen a sus fuentes (© UNHCR, IDMC, IOM, HDX, Frontex, Caminando Fronteras,
+ReliefWeb); este proyecto es una recopilación independiente con fines informativos y de análisis.
+Las cifras de Frontex son **detecciones** (no personas únicas) y las de Caminando Fronteras incluyen
+personas desaparecidas, por lo que no son comparables 1:1 entre sí ni con IOM MMP.
