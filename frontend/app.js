@@ -31,11 +31,14 @@ function initTabs() {
   const switchTab = (name) => {
     document.getElementById("tab-data").classList.toggle("active", name === "data");
     document.getElementById("tab-info").classList.toggle("active", name === "info");
+    document.getElementById("tab-about").classList.toggle("active", name === "about");
     document.getElementById("pane-data").classList.toggle("hidden", name !== "data");
     document.getElementById("pane-info").classList.toggle("hidden", name !== "info");
+    document.getElementById("pane-about").classList.toggle("hidden", name !== "about");
   };
   document.getElementById("tab-data").addEventListener("click", () => switchTab("data"));
   document.getElementById("tab-info").addEventListener("click", () => switchTab("info"));
+  document.getElementById("tab-about").addEventListener("click", () => switchTab("about"));
   document.getElementById("kofiBtn").href = KOFI_URL;
   document.getElementById("exportBtn").addEventListener("click", (e) => { e.preventDefault(); exportGeoJSON(); });
   document.getElementById("exportCsvBtn").addEventListener("click", (e) => { e.preventDefault(); exportCSV(); });

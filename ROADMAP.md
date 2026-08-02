@@ -16,8 +16,8 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 - **Frontend**: mapa con clústeres por tipo, niveles, heatmap, tema oscuro, filtro por año
   (2023–2026), **choropleth por país**, **popup de país al hacer click** (últimos 365 días +
   delta vs. período previo, click en choropleth y botón en popups de marcadores), capa de rutas
-  migratorias, funnel de bienvenida, i18n ES/EN, export CSV/GeoJSON, botón Ko-fi, pestaña
-  Fuentes (metodología, estado, contacto).
+  migratorias, funnel de bienvenida, i18n ES/EN, pestañas Datos / Fuentes / **Acerca de**,
+  export CSV/GeoJSON, botón Ko-fi, pestaña Fuentes (metodología, estado, contacto).
 - **API de país**: `GET /api/country/{iso3}?days=365` → `{name, affected, stocks, activity, delta}`.
 - **Semántica de datos corregida** (commit `3a91a80`): `affected` y `sum_value` global usan
   **último snapshot por tipo** (sin doble conteo de años consecutivos ni mezclar muertes);

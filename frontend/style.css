@@ -66,6 +66,9 @@ header .sub { font-size: 11px; color: var(--muted); }
 .links a { color: var(--accent); text-decoration: none; }
 .links a:hover { text-decoration: underline; }
 .legal { font-size: 11px; line-height: 1.6; color: var(--muted); }
+.about-text { font-size: 12px; line-height: 1.65; margin: 0 0 10px; color: var(--text); }
+.bio { padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; }
+.bio .about-text { margin-bottom: 4px; }
 
 .kofi-fixed {
   position: fixed; bottom: 20px; left: 20px; z-index: 9999;

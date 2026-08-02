@@ -75,6 +75,16 @@ const I18N = {
     cp_none: "Sin actividad en el período",
     cp_vs: "vs. período previo equivalente",
     cp_note_deaths: "Muertes/desaparecidos: IOM Missing Migrants Project (solo incidentes confirmados; las ONG registran cifras mayores, p. ej. en la ruta atlántica).",
+    tab_about: "Acerca de",
+    a_heading: "Acerca de este proyecto",
+    a_lead: "MigrationFlow OSINT es un <b>proyecto independiente de datos abiertos</b> que sigue los flujos migratorios y el desplazamiento forzado a escala global. Recopila automáticamente cifras oficiales de <b>UNHCR, IDMC, IOM (DTM y Missing Migrants Project)</b> y noticias humanitarias de <b>ReliefWeb</b>, las geolocaliza y las muestra en un mapa interactivo. Se actualiza dos veces al día sin intervención humana.",
+    a_why: "La migración suele narrarse con cifras aisladas o incompletas. La idea de este proyecto es reunirlas en un solo lugar, <b>reproducibles y verificables</b>, para que cualquier persona —periodista, investigador, organización o ciudadanía— pueda formarse una imagen propia.",
+    a_author: "Quién está detrás",
+    a_bio: "Proyecto personal e independiente de <b>Miguel Castillo</b>, analista de datos e investigador OSINT, especializado en visualizar datos públicos sobre migración y movimientos de población. Construido y mantenido de forma abierta y sin ánimo de lucro.",
+    a_tech: "Cómo se construye",
+    a_t1: "<b>Recopilación</b>: pipeline en Python que consulta dos veces al día las APIs y CSV oficiales (UNHCR, IDMC, IOM, HDX) y el RSS de ReliefWeb.",
+    a_t2: "<b>Procesamiento</b>: geolocalización, clasificación por tipo y severidad, y expiración automática de los eventos cuando la fuente deja de reportarlos.",
+    a_t3: "<b>Publicación</b>: API REST + mapa Leaflet como PWA, alojado en un servidor propio; todo el código es abierto en GitHub.",
   },
   en: {
     sub: "Migration flows and forced displacement at a global scale",
@@ -151,6 +161,16 @@ const I18N = {
     cp_none: "No activity in the period",
     cp_vs: "vs. equivalent previous period",
     cp_note_deaths: "Deaths/missing: IOM Missing Migrants Project (confirmed incidents only; NGOs record higher figures, e.g. Atlantic route).",
+    tab_about: "About",
+    a_heading: "About this project",
+    a_lead: "MigrationFlow OSINT is an <b>independent open-data project</b> tracking migration flows and forced displacement at a global scale. It automatically collects official figures from <b>UNHCR, IDMC, IOM (DTM and Missing Migrants Project)</b> and humanitarian news from <b>ReliefWeb</b>, geolocates them and displays them on an interactive map. It updates twice a day with no human intervention.",
+    a_why: "Migration is often told through isolated or incomplete figures. The idea of this project is to bring them together in one place, <b>reproducible and verifiable</b>, so that anyone — journalist, researcher, organization or citizen — can build their own picture.",
+    a_author: "Who is behind it",
+    a_bio: "A personal, independent project by <b>Miguel Castillo</b>, data analyst and OSINT researcher, focused on visualizing public data on migration and population movements. Built and maintained openly and non-profit.",
+    a_tech: "How it's built",
+    a_t1: "<b>Collection</b>: a Python pipeline queries the official APIs and CSVs (UNHCR, IDMC, IOM, HDX) and the ReliefWeb RSS twice a day.",
+    a_t2: "<b>Processing</b>: geolocation, classification by type and severity, and automatic expiry of events when the source stops reporting them.",
+    a_t3: "<b>Publishing</b>: REST API + Leaflet map as a PWA, hosted on our own server; all the code is open on GitHub.",
   },
 };
 
@@ -188,7 +208,7 @@ function levelLabel(lvl) {
 
 function applyLang() {
   document.documentElement.lang = LANG;
-  document.querySelectorAll("[data-i18n]").forEach(el => {
+  document.querySelectorAll("[data-i18n], [data-i18n-html]").forEach(el => {
     if (el.dataset.i18nAttr) { el.setAttribute(el.dataset.i18nAttr, t(el.dataset.i18n)); }
     else if (el.dataset.i18nHtml) { el.innerHTML = t(el.dataset.i18nHtml); }
     else { el.textContent = t(el.dataset.i18n); }
