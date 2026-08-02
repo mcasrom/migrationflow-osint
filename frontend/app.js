@@ -27,6 +27,72 @@ function fmtTime(d) {
   return new Date(d).toLocaleString(locale);
 }
 
+function showToast(msg) {
+  let el = document.getElementById("toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "toast";
+    el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 2400);
+}
+
+function applyTheme(dark) {
+  state.dark = dark;
+  if (map) {
+    if (dark) { map.removeLayer(lightLayer); if (!map.hasLayer(darkLayer)) darkLayer.addTo(map); }
+    else { map.removeLayer(darkLayer); if (!map.hasLayer(lightLayer)) lightLayer.addTo(map); }
+  }
+  const cb = document.getElementById("darkToggle");
+  if (cb) cb.checked = dark;
+  const btn = document.getElementById("themeToggle");
+  if (btn) { btn.textContent = dark ? "☀️" : "🌙"; btn.title = t(dark ? "theme_dark" : "theme_light"); }
+  try { localStorage.setItem("mf_theme", dark ? "dark" : "light"); } catch { }
+}
+
+function initShare() {
+  const btn = document.getElementById("shareBtn");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    const data = { title: "MigrationFlow OSINT", text: t("share_text"), url: location.href };
+    if (navigator.share) {
+      try { await navigator.share(data); return; } catch { }
+    }
+    try {
+      await navigator.clipboard.writeText(location.href);
+      showToast(t("copied"));
+    } catch { window.prompt("URL", location.href); }
+  });
+}
+
+let deferredInstall = null;
+
+function initInstall() {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstall = e;
+    const btn = document.getElementById("installBtn");
+    if (btn) btn.classList.remove("hidden");
+  });
+  const btn = document.getElementById("installBtn");
+  if (btn) btn.addEventListener("click", async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    await deferredInstall.userChoice;
+    deferredInstall = null;
+    btn.classList.add("hidden");
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredInstall = null;
+    const b = document.getElementById("installBtn");
+    if (b) b.classList.add("hidden");
+  });
+}
+
 function initTabs() {
   const switchTab = (name) => {
     document.getElementById("tab-data").classList.toggle("active", name === "data");
@@ -392,9 +458,10 @@ function initControls(eventTypes) {
     refreshEvents();
   });
   document.getElementById("darkToggle").addEventListener("change", e => {
-    state.dark = e.target.checked;
-    if (state.dark) { map.removeLayer(lightLayer); darkLayer.addTo(map); }
-    else { map.removeLayer(darkLayer); lightLayer.addTo(map); }
+    applyTheme(e.target.checked);
+  });
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    applyTheme(!state.dark);
   });
   document.getElementById("routesToggle").addEventListener("change", e => {
     if (e.target.checked) routesLayer.addTo(map);
@@ -418,6 +485,7 @@ function initControls(eventTypes) {
     LANG = LANG === "es" ? "en" : "es";
     localStorage.setItem("mf_lang", LANG);
     applyLang();
+    applyTheme(state.dark);
     buildTypeFilters(status ? status.event_types : null);
     populateYears();
     updateSummary();
@@ -569,9 +637,16 @@ async function loadAll() {
 applyLang();
 initIntro();
 initTabs();
+initShare();
+initInstall();
 populateYears();
+state.dark = (localStorage.getItem("mf_theme") || "dark") === "dark";
 try { initMap(); } catch (e) { console.error("initMap:", e); }
+applyTheme(state.dark);
 try { initKofi(); } catch (e) { console.error("initKofi:", e); }
 loadCountryLayer().catch(() => { });
 loadAll();
 setInterval(loadAll, 300000);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => { }));
+}

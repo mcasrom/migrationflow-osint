@@ -36,6 +36,20 @@ header .sub { font-size: 11px; color: var(--muted); }
   background: rgba(56,189,248,.12);
 }
 .badge.lang:hover { background: rgba(56,189,248,.25); }
+.btn-ghost {
+  display: block; width: 100%; margin: 10px 0; padding: 9px; cursor: pointer;
+  background: var(--panel-2); color: var(--accent); font-weight: 700; font-size: 12px;
+  border: 1px solid var(--accent); border-radius: 10px; transition: background .15s;
+}
+.btn-ghost:hover { background: rgba(56,189,248,.12); }
+.toast {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+  z-index: 20000; padding: 9px 18px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0,0,0,.45); opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 #map { position: absolute; inset: 0; }
 #panel {
   position: fixed; z-index: 1100; top: 52px; right: 12px; bottom: 12px; width: 300px;
