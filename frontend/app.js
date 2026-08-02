@@ -65,6 +65,7 @@ async function exportCSV() {
 
 function initKofi() {
   const btn = document.getElementById("kofiFloat");
+  if (!btn) return;
   btn.href = KOFI_URL;
   let count = parseInt(localStorage.getItem("mf_kofi_loads") || "0");
   count += 1;
@@ -102,17 +103,22 @@ async function exportGeoJSON() {
 
 function initIntro() {
   const intro = document.getElementById("intro");
+  if (!intro) return;
   const close = () => {
     intro.classList.add("hidden");
-    localStorage.setItem("mf_intro_seen", "1");
+    try { localStorage.setItem("mf_intro_seen", "1"); } catch { }
   };
-  document.getElementById("introClose").addEventListener("click", close);
-  document.getElementById("introGo").addEventListener("click", close);
-  document.getElementById("introSources").addEventListener("click", (e) => {
+  const closeBtn = document.getElementById("introClose");
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  const goBtn = document.getElementById("introGo");
+  if (goBtn) goBtn.addEventListener("click", close);
+  const srcLink = document.getElementById("introSources");
+  if (srcLink) srcLink.addEventListener("click", (e) => {
     e.preventDefault();
     close();
     document.getElementById("tab-info").click();
   });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !intro.classList.contains("hidden")) close(); });
   if (localStorage.getItem("mf_intro_seen") === "1") {
     intro.classList.add("hidden");
   } else {
@@ -264,11 +270,13 @@ function popupHtml(ev) {
 function placeEvent(ev) {
   if (!enabledTypes.has(ev.event_type)) return;
   if (LEVEL_RANK[ev.level] < LEVEL_RANK[state.minLevel]) return;
+  const layer = layers[ev.event_type];
+  if (!layer || typeof layer.addLayer !== "function") return;
   const marker = L.marker([ev.lat, ev.lon], { icon: iconFor(ev), title: ev.title });
   marker.bindPopup(popupHtml(ev));
   marker.on("mouseover", () => marker.openPopup());
   marker.on("mouseout", () => marker.closePopup());
-  layers[ev.event_type].addLayer(marker);
+  layer.addLayer(marker);
 }
 
 async function refreshEvents() {
@@ -280,10 +288,11 @@ async function refreshEvents() {
     const r = await fetch(`/api/events?${params}`);
     data = await r.json();
   } catch { return; }
+  const events = (data && Array.isArray(data.events)) ? data.events : [];
   for (const t of TYPE_ORDER) layers[t].clearLayers();
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
   const heatPts = [];
-  for (const ev of data.events) {
+  for (const ev of events) {
     placeEvent(ev);
     if (ev.event_type === "missing") {
       const w = Math.min(1, Math.log10(Math.max(1, Number(ev.value) || 1)) / 3);
@@ -333,6 +342,8 @@ async function updateSources() {
   box.innerHTML = html || t("t_no_runs");
 }
 
+let controlsBound = false;
+
 async function loadAll() {
   try {
     const [s, st] = await Promise.all([fetch("/api/summary"), fetch("/api/status")]);
@@ -340,7 +351,10 @@ async function loadAll() {
     status = await st.json();
     document.getElementById("totalBadge").innerHTML =
       `${fmt(summary.total_active)} <span data-i18n="events">${t("events")}</span>`;
-    initControls(status.event_types);
+    if (!controlsBound) {
+      controlsBound = true;
+      initControls(status.event_types);
+    }
     updateSummary();
     updateSources();
   } catch { }
@@ -348,10 +362,10 @@ async function loadAll() {
 }
 
 applyLang();
-initMap();
-initTabs();
-initKofi();
-populateYears();
 initIntro();
+initTabs();
+populateYears();
+try { initMap(); } catch (e) { console.error("initMap:", e); }
+try { initKofi(); } catch (e) { console.error("initKofi:", e); }
 loadAll();
 setInterval(loadAll, 300000);
