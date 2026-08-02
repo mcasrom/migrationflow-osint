@@ -5,7 +5,7 @@ const LEVEL_LABEL = { info: "info", warning: "warning", alert: "alert", critical
 
 const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "refugees_origin", "missing"];
 const TYPE_DEFAULT_HIDDEN = ["refugees_origin"];
-const KOFI_URL = "https://ko-fi.com/migrationflow";
+const KOFI_URL = "https://ko-fi.com/m_castillo";
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null;
 let state = { minLevel: "info", heat: false, dark: true };
@@ -26,6 +26,34 @@ function initTabs() {
     e.preventDefault();
     exportGeoJSON();
   });
+  document.getElementById("exportCsvBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    exportCSV();
+  });
+}
+
+const CSV_FIELDS = ["source", "source_id", "event_type", "category", "level",
+  "title", "country", "iso3", "admin_level", "value", "value_type",
+  "lat", "lon", "reported_at", "updated_at", "description"];
+
+function csvCell(v) {
+  const s = (v == null) ? "" : String(v);
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+async function exportCSV() {
+  try {
+    const r = await fetch("/api/events?limit=5000");
+    const data = await r.json();
+    const rows = data.events.map(ev => CSV_FIELDS.map(f => csvCell(ev[f])).join(","));
+    const csv = "\ufeff" + CSV_FIELDS.join(",") + "\r\n" + rows.join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "migrationflow_events.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch { }
 }
 
 async function exportGeoJSON() {

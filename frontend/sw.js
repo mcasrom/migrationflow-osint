@@ -1,4 +1,4 @@
-const CACHE = "migrationflow-v2";
+const CACHE = "migrationflow-v3";
 const ASSETS = ["/", "index.html", "style.css", "app.js", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", (e) => {
