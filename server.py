@@ -8,13 +8,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.logging import get_logger
-from src.db import init_db, fetch_events, fetch_summary, fetch_status
+from src.db import init_db, fetch_events, fetch_summary, fetch_status, fetch_country_summary
 from src.config import API_TITLE, API_VERSION, SERVER_HOST, SERVER_PORT, EVENT_TYPES
 
 logger = get_logger("src.api")
@@ -70,6 +70,14 @@ def api_events(
 @app.get("/api/summary")
 def api_summary():
     return fetch_summary()
+
+
+@app.get("/api/country/{iso3}")
+def api_country(iso3: str, days: int = Query(365, ge=30, le=730)):
+    data = fetch_country_summary(iso3.strip().upper(), days)
+    if data is None:
+        raise HTTPException(status_code=404, detail="País sin datos")
+    return data
 
 
 @app.get("/api/status")

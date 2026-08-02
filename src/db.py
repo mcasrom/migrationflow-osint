@@ -81,6 +81,7 @@ def init_db():
             )
         """)
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_geom ON events USING GIST (geom)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_iso3 ON events (iso3)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_type ON events (event_type)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_status ON events (status)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_expires ON events (expires_at)")
@@ -288,6 +289,72 @@ def fetch_events(types: Optional[list] = None, min_level: Optional[str] = None,
             r["expires_at"] = r["expires_at"].isoformat() if r["expires_at"] else None
             r["updated_at"] = r["updated_at"].isoformat() if r["updated_at"] else None
         return rows
+    finally:
+        release_conn(conn)
+
+
+def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
+    """Resumen de un país: stocks (último dato disponible) + actividad en los
+    últimos `days` días + delta vs. el período previo equivalente."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            "SELECT country FROM events WHERE iso3=%s AND status='active' "
+            "AND country<>'' ORDER BY updated_at DESC LIMIT 1", (iso3,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        name = row["country"]
+
+        cur.execute(
+            "SELECT DISTINCT ON (event_type) event_type, value, reported_at "
+            "FROM events WHERE iso3=%s AND status='active' "
+            "AND event_type IN ('refugees','asylum','idp','displacement','dtm_idp') "
+            "ORDER BY event_type, reported_at DESC", (iso3,))
+        stocks = [
+            {"type": r["event_type"], "value": r["value"],
+             "reported_at": r["reported_at"].isoformat() if r["reported_at"] else None}
+            for r in cur.fetchall()
+        ]
+
+        cur.execute(
+            "SELECT event_type, count(*) AS n, round(sum(value)::numeric) AS total, "
+            "min(reported_at)::date AS from_d, max(reported_at)::date AS to_d "
+            "FROM events WHERE iso3=%s AND status='active' "
+            "AND reported_at >= now() - make_interval(days => %s) "
+            "GROUP BY event_type", (iso3, days))
+        activity = {}
+        for r in cur.fetchall():
+            activity[r["event_type"]] = {
+                "count": r["n"],
+                "sum": float(r["total"]) if r["total"] is not None else None,
+                "from": str(r["from_d"]) if r["from_d"] else None,
+                "to": str(r["to_d"]) if r["to_d"] else None,
+            }
+
+        cur.execute(
+            "SELECT event_type, count(*) AS n, round(sum(value)::numeric) AS total "
+            "FROM events WHERE iso3=%s AND status='active' "
+            "AND reported_at >= now() - make_interval(days => %s) "
+            "AND reported_at < now() - make_interval(days => %s) "
+            "GROUP BY event_type", (iso3, days * 2, days))
+        delta = {}
+        for r in cur.fetchall():
+            delta[r["event_type"]] = {
+                "count": r["n"],
+                "sum": float(r["total"]) if r["total"] is not None else None,
+            }
+
+        cur.execute(
+            "SELECT round(sum(value)::numeric) FROM events "
+            "WHERE iso3=%s AND status='active' AND value IS NOT NULL", (iso3,))
+        affected = cur.fetchone()["round"]
+
+        return {"iso3": iso3, "name": name, "days": days,
+                "affected": float(affected) if affected is not None else None,
+                "stocks": stocks, "activity": activity, "delta": delta}
     finally:
         release_conn(conn)
 

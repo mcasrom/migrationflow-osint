@@ -230,7 +230,18 @@ async function loadCountryLayer() {
     style: CHORO_BASE_STYLE,
     onEachFeature: (f, layer) => {
       const iso = isoOfFeature(f);
-      if (iso) isoToLayer.set(iso, layer);
+      if (iso) {
+        isoToLayer.set(iso, layer);
+        layer.bindPopup("", { maxWidth: 340 });
+        layer.on("click", async () => {
+          layer.setPopupContent(`<div class="popup">${t("cp_loading")}</div>`);
+          layer.openPopup();
+          const data = await loadCountrySummary(iso, COUNTRY_SUMMARY_DAYS);
+          if (!data) { layer.setPopupContent(`<div class="popup cp-none">${t("cp_error")}</div>`); return; }
+          layer.setPopupContent(countryPopupHtml(data));
+          layer.openPopup();
+        });
+      }
       layer.bindTooltip("", { sticky: true, direction: "top" });
     },
   });
@@ -250,6 +261,70 @@ function eventIso3(ev) {
   if (ev.iso3) return ev.iso3;
   const n = normName(ev.country);
   return n ? nameToIso.get(n) || null : null;
+}
+
+const COUNTRY_SUMMARY_DAYS = 365;
+const countrySummaryCache = new Map();
+
+function esc(s) { return String(s == null ? "" : s).replace(/</g, "&lt;"); }
+
+async function loadCountrySummary(iso, days) {
+  const key = `${iso}|${days}`;
+  if (countrySummaryCache.has(key)) return countrySummaryCache.get(key);
+  try {
+    const r = await fetch(`/api/country/${encodeURIComponent(iso)}?days=${days}`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    countrySummaryCache.set(key, data);
+    return data;
+  } catch { return null; }
+}
+
+function fmtDelta(cur, prev) {
+  if (prev == null || cur == null) return { txt: "", cls: "" };
+  if (prev === 0) return { txt: cur > 0 ? "▲" : "", cls: cur > 0 ? "up" : "flat" };
+  const pct = Math.round(((cur - prev) / prev) * 100);
+  if (pct === 0) return { txt: "▬ 0%", cls: "flat" };
+  return { txt: `${pct > 0 ? "▲" : "▼"} ${pct > 0 ? "+" : ""}${pct}%`, cls: pct > 0 ? "up" : "down" };
+}
+
+function countryPopupHtml(d) {
+  const st = d.stocks || [];
+  const act = d.activity || {};
+  const dl = d.delta || {};
+  let html = `<div class="popup country-popup">
+    <h3>${esc(d.name) || d.iso3}</h3>
+    <div class="meta">${d.iso3} · ${t("cp_affected")}: <b>${d.affected != null ? fmt(d.affected) : "—"}</b></div>`;
+  if (st.length) {
+    const asof = st[0].reported_at ? fmtDate(st[0].reported_at) : "";
+    html += `<div class="cp-sub">${t("cp_stocks")}${asof ? ` <span class="cp-date">(${t("cp_latest")} ${asof})</span>` : ""}</div>
+      <table class="cp-table">` +
+      st.map(s => `<tr><td>${typeLabel(s.type, s.type)}</td><td class="cp-v">${fmt(s.value)}</td></tr>`).join("") +
+      `</table>`;
+  } else {
+    html += `<div class="cp-none">${t("cp_no_stock")}</div>`;
+  }
+  const keys = Object.keys(act);
+  if (keys.length) {
+    html += `<div class="cp-sub">${t("cp_activity").replace("{d}", fmt(d.days || COUNTRY_SUMMARY_DAYS))}</div>`;
+    for (const k of keys) {
+      const a = act[k];
+      if (k === "missing") {
+        const dlt = fmtDelta(a.count, dl.missing ? dl.missing.count : null);
+        html += `<div class="cp-row"><span>${t("cp_deaths")}</span><b>${fmt(a.sum)}</b><span class="cp-delta ${dlt.cls}">${dlt.txt}</span></div>
+          <div class="cp-row"><span>${t("cp_incidents")}</span><b>${fmt(a.count)}</b></div>`;
+      } else if (k === "news") {
+        const dlt = fmtDelta(a.count, dl.news ? dl.news.count : null);
+        html += `<div class="cp-row"><span>${t("cp_news")}</span><b>${fmt(a.count)}</b><span class="cp-delta ${dlt.cls}">${dlt.txt}</span></div>`;
+      } else {
+        html += `<div class="cp-row"><span>${typeLabel(k, k)}</span><b>${fmt(a.sum)}</b></div>`;
+      }
+    }
+    if (dl.missing || dl.news) html += `<div class="cp-foot">${t("cp_vs")}</div>`;
+  } else {
+    html += `<div class="cp-none">${t("cp_none")}</div>`;
+  }
+  return html + `</div>`;
 }
 
 function updateChoroplethLegend(max, count) {
@@ -380,9 +455,26 @@ function placeEvent(ev) {
   const layer = layers[ev.event_type];
   if (!layer || typeof layer.addLayer !== "function") return;
   const marker = L.marker([ev.lat, ev.lon], { icon: iconFor(ev), title: ev.title });
-  marker.bindPopup(popupHtml(ev));
+  const iso = ev.iso3 || eventIso3(ev);
+  marker.bindPopup(popupHtml(ev) + (iso
+    ? `<div class="popup-footer"><button class="popup-btn" data-iso3="${iso}">${t("cp_btn")}</button></div>`
+    : ""));
   marker.on("mouseover", () => marker.openPopup());
   marker.on("mouseout", () => marker.closePopup());
+  marker.on("popupopen", () => {
+    const btn = marker.getPopup().getElement()?.querySelector(".popup-btn");
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", async () => {
+      const p = marker.getPopup();
+      p.setContent(`<div class="popup">${t("cp_loading")}</div>`);
+      const data = await loadCountrySummary(btn.dataset.iso3, COUNTRY_SUMMARY_DAYS);
+      if (!data) { p.setContent(`<div class="popup cp-none">${t("cp_error")}</div>`); return; }
+      p.setContent(countryPopupHtml(data));
+      p.update();
+    });
+    L.DomEvent.disableClickPropagation(btn);
+  });
   layer.addLayer(marker);
 }
 
