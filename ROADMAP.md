@@ -96,7 +96,7 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 
 Priorizada (P1 = mayor valor/esfuerzo).
 
-### P1 — Siguiente iteración
+### Sprint actual — P1
 - [ ] **Modo tendencia**: color por % de cambio respecto al año anterior (▲▼, rojo/verde). Ya existe el
       filtro `year` (ahora también en el summary); falta la comparativa en el choropleth o una vista delta.
 - [ ] **Panel de gráficos**: pestaña con serie mensual de incidentes y top países afectados.
@@ -105,14 +105,33 @@ Priorizada (P1 = mayor valor/esfuerzo).
 - [ ] **Capa Frontex con tendencia**: serie mensual de entradas por ruta (hoy el dato del mes actual por ruta
       y anual por país); podría alimentar el modo tendencia.
 
-### P2 — Experiencia
+**P1 — estado de trabajo (agosto 2026, sesión abierta)**
+Orden pactado con el usuario: *Frontex tendencia → modo tendencia → gráficos*.
+Recon de servicios ArcGIS de Frontex (org `services9.arcgis.com/dujMioKFm7jZpirQ`):
+- **`DetectionsOfIBCs` capa 1** (países de origen): tiene campos mensuales `fYYYY_MM` por país,
+  **actualizados hasta 2026-05** (verificado `f2024_01`…`f2026_05`). **Fuente elegida** para la serie
+  mensual por país (suma de todas las rutas).
+- `CTR_Months_Total` (tabla, CTZ×mes×valor): serie mensual por nacionalidad pero **desactualizada**
+  (termina en 2025-01, 63 países × 36 meses) → **descartada**.
+- `Route_Country_Year_Total` (ruta×país×periodo YTD, p. ej. "Total Jan-Feb2024") y `CTR_Route_Total`
+  (CTZ×ruta×total): posible uso futuro, no bloquea nada.
+- No hay serie mensual **por ruta** actual en ArcGIS; el dato mensual por ruta actual ya lo damos como
+  `arrivals_route` (mes actual). La tendencia por ruta queda fuera de alcance (documentar si se retoma).
+
+Decisión P1a: tabla nueva `arrivals_series(country_iso3, month, value)` poblada por `frontex.py` desde
+los campos `fYYYY_MM` de la capa 1 (sin crear eventos); endpoint `/api/arrivals/series?country=&months=`.
+Alimentará el panel de gráficos y (junto con los `arrivals` anuales ya existentes) el modo tendencia.
+Frontend revisado: choropleth en `applyChoropleth` (app.js:558), `choroplethColor` (app.js:464),
+`state.year` ya filtra eventos y summary. Pendiente: implementar P1a/P1b/P1c, desplegar, CDP y commit.
+
+### Sprint posterior — P2 (experiencia, anotado)
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
 - [ ] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa.
 - [ ] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa.
 - [x] Open Graph / meta description completas para compartir en redes (`og.png` 1200×630 + Twitter card;
       preview de icono y RRSS en `/preview.html`, no indexado).
 
-### P3 — Calidad y automatización
+### Sprint posterior — P3 (calidad y automatización, anotado)
 - [ ] Tests automatizados (unittest de `src.db`, `countries`, colectores con fixtures).
 - [ ] CI en GitHub Actions (lint + tests) para proteger `main`.
 - [ ] Alerta visible en el frontend si un colector falla 2+ corridas seguidas (hoy solo estado en "Fuentes").
