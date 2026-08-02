@@ -57,6 +57,10 @@ const I18N = {
     st_events: "Eventos activos",
     st_sources: "Fuentes activas",
     st_people: "Personas afectadas",
+    choropleth: "Mapa por países (choropleth)",
+    ch_legend: "Personas afectadas por país",
+    ch_no_data: "Sin datos",
+    ch_events_n: "eventos",
   },
   en: {
     sub: "Migration flows and forced displacement at a global scale",
@@ -115,6 +119,10 @@ const I18N = {
     st_events: "Active events",
     st_sources: "Active sources",
     st_people: "People affected",
+    choropleth: "Map by country (choropleth)",
+    ch_legend: "People affected per country",
+    ch_no_data: "No data",
+    ch_events_n: "events",
   },
 };
 

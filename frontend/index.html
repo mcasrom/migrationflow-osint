@@ -26,6 +26,11 @@
 
 <main>
   <div id="map"></div>
+  <div id="choroplethLegend" class="choropleth-legend hidden">
+    <div class="cl-title"></div>
+    <div class="cl-bar"></div>
+    <div class="cl-scale"><span class="cl-min"></span><span class="cl-max"></span></div>
+  </div>
 
   <aside id="panel">
     <div class="tabs">
@@ -52,6 +57,7 @@
         <label class="chk"><input type="checkbox" id="heatToggle"> <span data-i18n="heat">Densidad de incidentes (heatmap)</span></label>
         <label class="chk"><input type="checkbox" id="darkToggle" checked> <span data-i18n="dark">Tema oscuro</span></label>
         <label class="chk"><input type="checkbox" id="routesToggle"> <span data-i18n="routes">Rutas migratorias (aprox.)</span></label>
+        <label class="chk"><input type="checkbox" id="choroplethToggle"> <span data-i18n="choropleth">Mapa por países (choropleth)</span></label>
       </section>
 
       <section class="panel-section">

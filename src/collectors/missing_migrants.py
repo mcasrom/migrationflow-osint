@@ -7,6 +7,7 @@ import httpx
 
 from src.config import (HDX_MMP_URL, HTTP_TIMEOUT, USER_AGENT,
                         MMP_RETENTION_MONTHS, severity_for)
+from src.collectors.countries import match_country_iso3
 from src.logging import get_logger
 from src.models import Event, fmt_int
 from src.collectors.base import BaseCollector
@@ -102,7 +103,7 @@ class MissingMigrantsCollector(BaseCollector):
                     title=f"{fmt_int(total)} muertos y desaparecidos en {country}",
                     description=desc,
                     country=country,
-                    iso3="",
+                    iso3=match_country_iso3(country) or "",
                     category="incident",
                     admin_level="incident",
                     value=float(total),

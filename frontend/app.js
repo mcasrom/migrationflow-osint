@@ -7,6 +7,8 @@ const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "ref
 const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "news"];
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
+let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
+let lastEvents = [];
 let state = { minLevel: "info", heat: false, dark: true, year: "" };
 const enabledTypes = new Set();
 let summary = null, status = null;
@@ -183,6 +185,9 @@ function buildTypeFilters(eventTypes) {
       if (on) enabledTypes.add(t); else enabledTypes.delete(t);
       if (on) { if (!map.hasLayer(layers[t])) layers[t].addTo(map); }
       else map.removeLayer(layers[t]);
+      if (state.choropleth) {
+        applyChoropleth(lastEvents.filter(ev => enabledTypes.has(ev.event_type)));
+      }
       updateSummary();
     });
     box.appendChild(btn);
@@ -199,6 +204,94 @@ function populateYears() {
     opt.textContent = String(y);
     sel.appendChild(opt);
   }
+}
+
+const CHORO_BASE_STYLE = { weight: 1, opacity: 0.85, color: "#334155", fillOpacity: 0.72 };
+const CHORO_RAMP = [[251, 230, 214], [254, 200, 132], [253, 141, 60], [217, 72, 15], [140, 45, 4]];
+
+function normName(n) { return String(n || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+
+function isoOfFeature(f) {
+  const p = f.properties || {};
+  const iso = p.ISO_A3 && p.ISO_A3 !== "-99" ? p.ISO_A3 : (p.ISO_N3 ? p.ISO_N3 : null);
+  return iso;
+}
+
+async function loadCountryLayer() {
+  if (countryLayer) return;
+  const r = await fetch("countries.geojson");
+  const gj = await r.json();
+  for (const f of gj.features || []) {
+    const iso = isoOfFeature(f);
+    const name = normName(f.properties.NAME || f.properties.ADMIN || "");
+    if (iso && name) nameToIso.set(name, iso);
+  }
+  countryLayer = L.geoJSON(gj, {
+    style: CHORO_BASE_STYLE,
+    onEachFeature: (f, layer) => {
+      const iso = isoOfFeature(f);
+      if (iso) isoToLayer.set(iso, layer);
+      layer.bindTooltip("", { sticky: true, direction: "top" });
+    },
+  });
+}
+
+function choroplethColor(frac) {
+  const f = Math.min(1, Math.max(0, frac));
+  const scaled = f * (CHORO_RAMP.length - 1);
+  const i = Math.min(CHORO_RAMP.length - 2, Math.floor(scaled));
+  const t = scaled - i;
+  const a = CHORO_RAMP[i], b = CHORO_RAMP[i + 1];
+  const c = a.map((v, k) => Math.round(v + (b[k] - v) * t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+function eventIso3(ev) {
+  if (ev.iso3) return ev.iso3;
+  const n = normName(ev.country);
+  return n ? nameToIso.get(n) || null : null;
+}
+
+function updateChoroplethLegend(max, count) {
+  const legend = document.getElementById("choroplethLegend");
+  if (!state.choropleth) { legend.classList.add("hidden"); return; }
+  legend.classList.remove("hidden");
+  legend.querySelector(".cl-title").textContent = t("ch_legend");
+  legend.querySelector(".cl-min").textContent = "0";
+  legend.querySelector(".cl-max").textContent = max > 0 ? fmt(max) : "—";
+}
+
+function applyChoropleth(events) {
+  if (!state.choropleth) {
+    if (countryLayer) countryLayer.setStyle(CHORO_BASE_STYLE);
+    updateChoroplethLegend(0, 0);
+    return;
+  }
+  if (!countryLayer || !map.hasLayer(countryLayer)) return;
+  const sums = new Map();
+  for (const ev of events) {
+    const iso = eventIso3(ev);
+    if (!iso) continue;
+    const v = Number(ev.value) || 0;
+    const cur = sums.get(iso) || { sum: 0, count: 0 };
+    cur.sum += v; cur.count += 1;
+    sums.set(iso, cur);
+  }
+  let max = 0;
+  sums.forEach(c => { if (c.sum > max) max = c.sum; });
+  isoToLayer.forEach((layer, iso) => {
+    const data = sums.get(iso);
+    if (!data) {
+      layer.setStyle({ ...CHORO_BASE_STYLE, fillColor: "#1e293b", fillOpacity: 0.35 });
+      layer.setTooltipContent("");
+      return;
+    }
+    const frac = max > 0 ? Math.log10(data.sum + 1) / Math.log10(max + 1) : 0;
+    layer.setStyle({ ...CHORO_BASE_STYLE, fillColor: choroplethColor(frac) });
+    layer.setTooltipContent(
+      `<b>${iso}</b><br>${fmt(data.sum)} · ${data.count} ${t("ch_events_n")}`);
+  });
+  updateChoroplethLegend(max, sums.size);
 }
 
 function initControls(eventTypes) {
@@ -227,6 +320,20 @@ function initControls(eventTypes) {
   document.getElementById("routesToggle").addEventListener("change", e => {
     if (e.target.checked) routesLayer.addTo(map);
     else map.removeLayer(routesLayer);
+  });
+  document.getElementById("choroplethToggle").addEventListener("change", async e => {
+    state.choropleth = e.target.checked;
+    if (state.choropleth) {
+      try {
+        await loadCountryLayer();
+        if (!map.hasLayer(countryLayer)) countryLayer.addTo(map);
+        refreshEvents();
+      } catch { }
+    } else {
+      if (countryLayer && map.hasLayer(countryLayer)) map.removeLayer(countryLayer);
+      updateChoroplethLegend(0, 0);
+      refreshEvents();
+    }
   });
   document.getElementById("langToggle").addEventListener("click", () => {
     LANG = LANG === "es" ? "en" : "es";
@@ -289,6 +396,7 @@ async function refreshEvents() {
     data = await r.json();
   } catch { return; }
   const events = (data && Array.isArray(data.events)) ? data.events : [];
+  lastEvents = events;
   for (const t of TYPE_ORDER) layers[t].clearLayers();
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
   const heatPts = [];
@@ -304,6 +412,7 @@ async function refreshEvents() {
       gradient: { 0.2: "#ffb020", 0.5: "#ff7043", 0.8: "#f43f5e", 1: "#ff0040" } });
     heatLayer.addTo(map);
   }
+  applyChoropleth(events);
   document.getElementById("lastUpdate").textContent = `${t("updated")} ${fmtTime(new Date())}`;
 }
 
@@ -367,5 +476,6 @@ initTabs();
 populateYears();
 try { initMap(); } catch (e) { console.error("initMap:", e); }
 try { initKofi(); } catch (e) { console.error("initKofi:", e); }
+loadCountryLayer().catch(() => { });
 loadAll();
 setInterval(loadAll, 300000);

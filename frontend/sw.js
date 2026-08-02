@@ -1,5 +1,5 @@
-const CACHE = "migrationflow-v6";
-const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "manifest.webmanifest", "icon.svg"];
+const CACHE = "migrationflow-v7";
+const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));

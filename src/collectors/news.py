@@ -15,7 +15,7 @@ from src.config import (RELIEFWEB_RSS, NEWS_KEYWORDS, NEWS_MAX_ITEMS,
 from src.logging import get_logger
 from src.models import Event
 from src.collectors.base import BaseCollector
-from src.collectors.countries import match_country_by_name
+from src.collectors.countries import match_country_by_name, match_country_iso3
 
 logger = get_logger("src.collectors.news")
 

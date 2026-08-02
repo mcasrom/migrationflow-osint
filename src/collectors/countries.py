@@ -41,7 +41,24 @@ _NAME_VARIANTS = {
     "the gambia": "GMB", "the bahamas": "BHS", "the netherlands": "NLD",
     "united kingdom": "GBR", "uk": "GBR",
     "vietnam": "VNM",
+    "democratic people's republic of korea": "PRK",
+    "republic of korea": "KOR",
+    "united republic of tanzania": "TZA",
+    "tanzania": "TZA",
+    "united kingdom of great britain and northern ireland": "GBR",
+    "china, hong kong special administrative region": "HKG",
+    "hong kong": "HKG",
+    "macedonia (the former yugoslav republic of)": "MKD",
 }
+
+_ENTITY_RE = re.compile(r"&#0*39;|&#x27;", re.IGNORECASE)
+
+
+def _clean_name(name: str) -> str:
+    """Normaliza un nombre de país: entidades HTML, espacios, paréntesis."""
+    s = name.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+    s = _ENTITY_RE.sub("'", s)
+    return re.sub(r"\s+", " ", s.strip()).lower()
 
 
 def geo_for(iso3: str):
@@ -65,13 +82,21 @@ def match_country_by_name(name: str):
     """Resuelve un nombre de país (categoría RSS, texto libre) a su centroide."""
     if not name:
         return None
-    s = name.strip().lower()
+    s = _clean_name(name)
     if s in _NAME_FALLBACK:
-        return GEO[_NAME_FALLBACK[s]]
+        iso = _NAME_FALLBACK[s]
+        return {**GEO[iso], "iso3": iso}
     s2 = re.sub(r"\(.*?\)", "", s).strip()
     if s2 and s2 in _NAME_FALLBACK:
-        return GEO[_NAME_FALLBACK[s2]]
+        iso = _NAME_FALLBACK[s2]
+        return {**GEO[iso], "iso3": iso}
     iso = _NAME_VARIANTS.get(s) or _NAME_VARIANTS.get(s2)
-    if iso:
-        return GEO.get(iso)
+    if iso and iso in GEO:
+        return {**GEO[iso], "iso3": iso}
     return None
+
+
+def match_country_iso3(name: str):
+    """Devuelve el código ISO3 para un nombre de país, o None."""
+    geo = match_country_by_name(name)
+    return geo["iso3"] if geo else None
