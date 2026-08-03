@@ -26,6 +26,14 @@ header {
 header h1 { font-size: 17px; letter-spacing: .5px; }
 header h1 span { color: var(--accent); font-weight: 700; }
 header .sub { font-size: 11px; color: var(--muted); }
+.panel-toggle {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex: none;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--panel-2); color: var(--text); font-size: 15px; cursor: pointer;
+}
+.panel-toggle:hover { background: rgba(56,189,248,.12); }
 .status-row { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .badge {
   font-size: 11px; padding: 3px 9px; border-radius: 999px;
@@ -267,6 +275,14 @@ header .sub { font-size: 11px; color: var(--muted); }
 .chart-legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
 @media (max-width: 720px) {
-  #panel { width: min(300px, 82vw); top: 90px; }
+  .panel-toggle { display: inline-flex; }
+  #panel {
+    width: min(300px, 85vw); top: 90px;
+    transform: translateX(calc(100% + 16px));
+    transition: transform .25s ease;
+    box-shadow: 0 0 40px rgba(0,0,0,.5);
+  }
+  body.panel-open #panel { transform: none; }
+  .choropleth-legend { right: auto; left: 12px; bottom: 24px; }
   header .sub { display: none; }
 }

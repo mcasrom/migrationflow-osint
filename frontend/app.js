@@ -1013,9 +1013,26 @@ async function loadAll() {
   await refreshEvents();
 }
 
+function initPanelToggle() {
+  const btn = document.getElementById("panelToggle");
+  if (!btn) return;
+  const toggle = () => document.body.classList.toggle("panel-open");
+  btn.addEventListener("click", toggle);
+  const mapEl = document.getElementById("map");
+  if (mapEl) {
+    mapEl.addEventListener("click", (e) => {
+      if (window.innerWidth <= 720 && !e.target.closest("#panel")
+          && document.body.classList.contains("panel-open")) {
+        document.body.classList.remove("panel-open");
+      }
+    });
+  }
+}
+
 applyLang();
 initIntro();
 initTabs();
+initPanelToggle();
 initShare();
 initInstall();
 initVerifier();
