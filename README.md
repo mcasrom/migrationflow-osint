@@ -75,6 +75,9 @@ data/countries_geo.json  centroides ISO3 (250 países)
 | `/api/events?types=&min_level=&max_age_days=&bbox=&year=&limit=` | eventos activos (filtros combinables) |
 | `/api/summary` | totales por tipo, nivel y suma de valor |
 | `/api/country/{iso3}?days=` | resumen por país (stocks, entradas Frontex, actividad) |
+| `/api/arrivals/series?country=&months=` | serie mensual de entradas Frontex (global o por país) |
+| `/api/trends` | tendencia de entradas por país (YTD actual vs. mismo periodo previo, % variación) |
+| `/api/charts` | datos del panel de gráficos (incidentes mensuales, entradas mensuales, top países) |
 | `/api/context?q=&lang=` | tarjetas de contexto (cruza bulos + datos reales) para un claim |
 | `/api/verify` (POST `{q, lang}`) | verificador de bulos: matches curados + eventos reales + fact-checkers |
 | `/api/status` | estado por colector + tipos de evento |

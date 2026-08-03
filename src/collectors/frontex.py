@@ -23,6 +23,7 @@ from src.config import (FRONTEX_SERVER, FRONTEX_COUNTRIES_LAYER,
                         MIN_VALUE, severity_for)
 from src.logging import get_logger
 from src.models import Event, fmt_int
+from src.db import save_arrivals_series
 from src.collectors.base import BaseCollector
 from src.collectors.countries import geo_for
 
@@ -106,9 +107,28 @@ class FrontexCollector(BaseCollector):
 
         events.extend(self._country_events(countries))
         events.extend(self._route_events(routes))
-        logger.info("[frontex] %d eventos (%d países, %d rutas)",
-                    len(events), len(countries), len(routes))
+        n = save_arrivals_series(self._country_series(countries))
+        logger.info("[frontex] %d eventos (%d países, %d rutas), %d puntos de serie mensual",
+                    len(events), len(countries), len(routes), n)
         return events
+
+    def _country_series(self, features: list[dict]) -> list[tuple]:
+        """Serie mensual por país de origen (todos los meses disponibles, sin eventos)."""
+        rows: list[tuple] = []
+        for feat in features:
+            attrs = feat.get("attributes") or {}
+            iso3 = (attrs.get("ISO3_CODE") or "").strip().upper()
+            if not iso3 or not geo_for(iso3):
+                continue
+            for k, v in attrs.items():
+                m = _MONTH_RE.match(k)
+                if not m or v is None or v == "-":
+                    continue
+                val = _num(v)
+                if val > 0:
+                    month = f"{m.group(1)}-{m.group(2)}-01"
+                    rows.append((iso3, month, float(val)))
+        return rows
 
     def _country_events(self, features: list[dict]) -> list[Event]:
         events: list[Event] = []

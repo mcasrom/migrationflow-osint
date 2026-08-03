@@ -34,8 +34,15 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 - **API de país**: `GET /api/country/{iso3}?days=365` → `{name, affected, stocks, activity, delta}`.
 - **Frontex (entradas)**: colector automático sobre el ArcGIS FeatureServer público de detecciones de cruces
   irregulares (IBC). Ingesta **entradas anuales por país de origen** (`arrivals`, años completos recientes +
-  parcial actual) y **totales mensuales por ruta** (`arrivals_route`). Nota metodológica: Frontex cuenta
+  parcial actual), **totales mensuales por ruta** (`arrivals_route`) y la **serie mensual por país de origen**
+  (tabla `arrivals_series`, ~36 meses, sin eventos). Nota metodológica: Frontex cuenta
   *detecciones* (una persona puede contarse varias veces).
+- **Tendencia (modo mapa)**: toggle *Tendencia* sobre el choropleth colorea cada país por la **variación de
+  entradas Frontex** (acumulado YTD actual vs. mismo periodo del año anterior, comparable), con rojo/verde
+  ▲▼ y leyenda; datos vía `/api/trends`.
+- **Panel de gráficos**: pestaña *Gráficos* con serie mensual de incidentes de muertes/desapariciones
+  (barras + línea), serie mensual de entradas Frontex (línea) y top países por personas afectadas;
+  SVG propio (sin librerías externas), datos vía `/api/charts`.
 - **Caminando Fronteras (víctimas)**: colector curado que localiza el último informe del *Monitoreo del
   Derecho a la Vida* vía el RSS del sitio y parsea las víctimas por ruta hacia España (`cf_victims`;
   Atlántica, Argelia, Estrecho, Alborán, Terrestre). Cada nuevo informe expira el anterior. La cifra es una
@@ -97,32 +104,23 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 Priorizada (P1 = mayor valor/esfuerzo).
 
 ### Sprint actual — P1
-- [ ] **Modo tendencia**: color por % de cambio respecto al año anterior (▲▼, rojo/verde). Ya existe el
+- [x] **Modo tendencia**: color por % de cambio respecto al año anterior (▲▼, rojo/verde). Ya existe el
       filtro `year` (ahora también en el summary); falta la comparativa en el choropleth o una vista delta.
-- [ ] **Panel de gráficos**: pestaña con serie mensual de incidentes y top países afectados.
+- [x] **Panel de gráficos**: pestaña con serie mensual de incidentes y top países afectados.
 - [ ] **Geocoding fino para news**: localizar subregiones/ciudades (hoy centroide de país).
 - [ ] **Ampliar dataset de bulos** a más claims (hoy 6 curados) y añadir verificación por URL/claim compartido.
-- [ ] **Capa Frontex con tendencia**: serie mensual de entradas por ruta (hoy el dato del mes actual por ruta
-      y anual por país); podría alimentar el modo tendencia.
+- [x] **Capa Frontex con tendencia**: serie mensual de **entradas por país de origen** (tabla
+      `arrivals_series`, fuente: campos `fYYYY_MM` de `DetectionsOfIBCs` capa 1, actualizados). El dato
+      mensual **por ruta** no está disponible en ArcGIS (solo mes actual, ya en `arrivals_route`), por lo
+      que la tendencia se construye a nivel país; alimenta el modo tendencia y los gráficos.
 
-**P1 — estado de trabajo (agosto 2026, sesión abierta)**
-Orden pactado con el usuario: *Frontex tendencia → modo tendencia → gráficos*.
-Recon de servicios ArcGIS de Frontex (org `services9.arcgis.com/dujMioKFm7jZpirQ`):
-- **`DetectionsOfIBCs` capa 1** (países de origen): tiene campos mensuales `fYYYY_MM` por país,
-  **actualizados hasta 2026-05** (verificado `f2024_01`…`f2026_05`). **Fuente elegida** para la serie
-  mensual por país (suma de todas las rutas).
-- `CTR_Months_Total` (tabla, CTZ×mes×valor): serie mensual por nacionalidad pero **desactualizada**
-  (termina en 2025-01, 63 países × 36 meses) → **descartada**.
-- `Route_Country_Year_Total` (ruta×país×periodo YTD, p. ej. "Total Jan-Feb2024") y `CTR_Route_Total`
-  (CTZ×ruta×total): posible uso futuro, no bloquea nada.
-- No hay serie mensual **por ruta** actual en ArcGIS; el dato mensual por ruta actual ya lo damos como
-  `arrivals_route` (mes actual). La tendencia por ruta queda fuera de alcance (documentar si se retoma).
-
-Decisión P1a: tabla nueva `arrivals_series(country_iso3, month, value)` poblada por `frontex.py` desde
-los campos `fYYYY_MM` de la capa 1 (sin crear eventos); endpoint `/api/arrivals/series?country=&months=`.
-Alimentará el panel de gráficos y (junto con los `arrivals` anuales ya existentes) el modo tendencia.
-Frontend revisado: choropleth en `applyChoropleth` (app.js:558), `choroplethColor` (app.js:464),
-`state.year` ya filtra eventos y summary. Pendiente: implementar P1a/P1b/P1c, desplegar, CDP y commit.
+**P1 — nota de implementación (agosto 2026)**
+Serie mensual: `arrivals_series(country_iso3, month, value)` poblada por `frontex.py` desde los campos
+`fYYYY_MM` de `DetectionsOfIBCs` capa 1 (~36 meses, 78 países, sin crear eventos). Recon previo:
+`CTR_Months_Total` (CTZ×mes) **descartada** por desactualizada (termina en 2025-01); no hay serie mensual
+por ruta en ArcGIS. Endpoints: `/api/arrivals/series`, `/api/trends` (YTD vs. mismo periodo previo),
+`/api/charts`. Frontend: toggle *Tendencia* sobre choropleth (rojo/verde ▲▼) y pestaña *Gráficos*
+(SVG propio, sin librerías). Verificado con CDP.
 
 ### Sprint posterior — P2 (experiencia, anotado)
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).

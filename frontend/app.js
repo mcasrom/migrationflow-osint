@@ -9,9 +9,10 @@ const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "arrivals_route", "news"];
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
 let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
 let lastEvents = [];
-let state = { minLevel: "info", heat: false, dark: true, year: "" };
+let state = { minLevel: "info", heat: false, dark: true, year: "", trend: false };
 const enabledTypes = new Set();
 let summary = null, status = null;
+let trendData = null, chartsLoaded = false;
 
 function fmt(n) {
   if (n == null) return "—";
@@ -238,16 +239,115 @@ function initAlerts() {
   if (saved === "1" && toggle.checked) showStatus(t("alerts_on").replace("{r}", regionName()), true);
 }
 
+// ── Panel de gráficos ─────────────────────────────────────────────
+
+function monthLabel(m) { return m ? m.replace(/-/g, "/") : ""; }
+
+function lineChart(points, color) {
+  if (!points || !points.length) return `<div class="chart-empty">${t("ch_no_data")}</div>`;
+  const W = 270, H = 120, PAD = 8;
+  const max = Math.max(...points.map(p => Number(p.value) || 0), 1);
+  const step = (W - PAD * 2) / Math.max(1, points.length - 1);
+  const coords = points.map((p, i) => {
+    const x = PAD + i * step;
+    const y = H - PAD - ((Number(p.value) || 0) / max) * (H - PAD * 2);
+    return { x, y, ...p };
+  });
+  const path = coords.map((c, i) => `${i ? "L" : "M"}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(" ");
+  const area = `${path} L${coords[coords.length - 1].x.toFixed(1)},${H - PAD} L${PAD},${H - PAD} Z`;
+  const f1 = coords[0], f2 = coords[coords.length - 1];
+  return `<svg width="${W}" height="${H}">
+    <path d="${area}" style="fill:${color};opacity:.14"/>
+    <path d="${path}" style="fill:none;stroke:${color};stroke-width:1.6"/>
+    <text x="${PAD}" y="${PAD + 5}" font-size="8" style="fill:var(--muted)">${fmt(max)}</text>
+    <text x="${f1.x}" y="${H - 3}" font-size="8" style="fill:var(--muted)">${monthLabel(f1.month)}</text>
+    <text x="${f2.x}" y="${H - 3}" font-size="8" text-anchor="end" style="fill:var(--muted)">${monthLabel(f2.month)}</text>
+  </svg>`;
+}
+
+function comboChart(points, deaths) {
+  if (!points || !points.length) return `<div class="chart-empty">${t("ch_no_data")}</div>`;
+  const W = 270, H = 120, PAD = 8;
+  const maxD = Math.max(...deaths.map(p => Number(p.deaths) || 0), 1);
+  const maxN = Math.max(...points.map(p => Number(p.count) || 0), 1);
+  const step = (W - PAD * 2) / Math.max(1, points.length - 1);
+  const bars = points.map((p, i) => {
+    const x = PAD + i * step;
+    const h = ((Number(deaths[i] && deaths[i].deaths) || 0) / maxD) * (H - PAD * 2);
+    return `<rect x="${(x - step / 2.5).toFixed(1)}" y="${(H - PAD - h).toFixed(1)}" width="${(step * 0.8).toFixed(1)}" height="${h.toFixed(1)}" style="fill:var(--accent);opacity:.5"/>`;
+  }).join("");
+  const line = points.map((p, i) => {
+    const x = PAD + i * step;
+    const y = H - PAD - ((Number(p.count) || 0) / maxN) * (H - PAD * 2);
+    return `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const f1 = points[0], f2 = points[points.length - 1];
+  return `<svg width="${W}" height="${H}">
+    ${bars}
+    <path d="${line}" style="fill:none;stroke:#f43f5e;stroke-width:1.6;stroke-dasharray:3 2"/>
+    <text x="${PAD}" y="${PAD + 5}" font-size="8" style="fill:var(--muted)">${fmt(maxD)}</text>
+    <text x="${f1.x}" y="${H - 3}" font-size="8" style="fill:var(--muted)">${monthLabel(f1.month)}</text>
+    <text x="${f2.x}" y="${H - 3}" font-size="8" text-anchor="end" style="fill:var(--muted)">${monthLabel(f2.month)}</text>
+  </svg>`;
+}
+
+function topBars(items) {
+  if (!items || !items.length) return `<div class="chart-empty">${t("ch_no_data")}</div>`;
+  const max = Math.max(...items.map(x => Number(x.value) || 0), 1);
+  return `<div class="chart-bars">` + items.map(x => `
+    <div class="bar-row">
+      <span class="bar-label" title="${esc(x.country || x.iso3)}">${esc(x.country || x.iso3)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round((Number(x.value) / max) * 100)}%"></div></div>
+      <span class="bar-val">${fmt(x.value)}</span>
+    </div>`).join("") + `</div>`;
+}
+
+async function loadCharts() {
+  if (chartsLoaded) return;
+  chartsLoaded = true;
+  let data;
+  try {
+    const r = await fetch("/api/charts");
+    data = await r.json();
+  } catch {
+    ["chartIncidents", "chartArrivals", "chartTop"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = t("ch_no_data");
+    });
+    return;
+  }
+  const inc = document.getElementById("chartIncidents");
+  const arr = document.getElementById("chartArrivals");
+  const top = document.getElementById("chartTop");
+  if (inc) inc.innerHTML =
+    `<div class="chart-legend">
+       <span class="lg"><span class="sw" style="background:var(--accent)"></span>${t("ch_legend_deaths")}</span>
+       <span class="lg"><span class="sw" style="background:#f43f5e;border-radius:0;height:2px;align-self:center"></span>${t("ch_legend_inc")}</span>
+     </div>` + comboChart(data.monthly_incidents || [], data.monthly_incidents || []);
+  if (arr) {
+    const pts = data.monthly_arrivals || [];
+    const asof = pts.length ? pts[pts.length - 1].month : null;
+    const note = document.querySelector(".chart-note[data-i18n=ch_arrivals_note]");
+    if (note) note.textContent = t("ch_arrivals_note").replace("{m}", asof || "—");
+    arr.innerHTML = lineChart(pts, "var(--accent)");
+  }
+  if (top) top.innerHTML = topBars(data.top_countries || []);
+}
+
 function initTabs() {
   const switchTab = (name) => {
     document.getElementById("tab-data").classList.toggle("active", name === "data");
+    document.getElementById("tab-charts").classList.toggle("active", name === "charts");
     document.getElementById("tab-info").classList.toggle("active", name === "info");
     document.getElementById("tab-about").classList.toggle("active", name === "about");
     document.getElementById("pane-data").classList.toggle("hidden", name !== "data");
+    document.getElementById("pane-charts").classList.toggle("hidden", name !== "charts");
     document.getElementById("pane-info").classList.toggle("hidden", name !== "info");
     document.getElementById("pane-about").classList.toggle("hidden", name !== "about");
+    if (name === "charts") loadCharts();
   };
   document.getElementById("tab-data").addEventListener("click", () => switchTab("data"));
+  document.getElementById("tab-charts").addEventListener("click", () => switchTab("charts"));
   document.getElementById("tab-info").addEventListener("click", () => switchTab("info"));
   document.getElementById("tab-about").addEventListener("click", () => switchTab("about"));
   document.getElementById("kofiBtn").href = KOFI_URL;
@@ -323,8 +423,7 @@ function initIntro() {
   const close = () => {
     intro.classList.add("hidden");
     try { localStorage.setItem("mf_intro_seen", "1"); } catch { }
-  };
-  const closeBtn = document.getElementById("introClose");
+  };  const closeBtn = document.getElementById("introClose");
   if (closeBtn) closeBtn.addEventListener("click", close);
   const goBtn = document.getElementById("introGo");
   if (goBtn) goBtn.addEventListener("click", close);
@@ -548,11 +647,48 @@ function countryPopupHtml(d) {
 
 function updateChoroplethLegend(max, count) {
   const legend = document.getElementById("choroplethLegend");
+  const bar = legend.querySelector(".cl-bar");
   if (!state.choropleth) { legend.classList.add("hidden"); return; }
   legend.classList.remove("hidden");
+  const note = legend.querySelector(".cl-note");
+  if (state.trend && trendData) {
+    legend.querySelector(".cl-title").textContent = t("ch_legend_trend");
+    bar.classList.add("trend");
+    legend.querySelector(".cl-min").textContent = "▼ -100%";
+    legend.querySelector(".cl-mid").textContent = "0%";
+    legend.querySelector(".cl-max").textContent = "▲ +100%";
+    note.textContent = t("ch_trend_note").replace("{m}", trendData.asof || "—");
+    return;
+  }
+  bar.classList.remove("trend");
   legend.querySelector(".cl-title").textContent = t("ch_legend");
   legend.querySelector(".cl-min").textContent = "0";
+  legend.querySelector(".cl-mid").textContent = "";
   legend.querySelector(".cl-max").textContent = max > 0 ? fmt(max) : "—";
+  note.textContent = "";
+}
+
+async function ensureTrend() {
+  if (trendData) return;
+  try {
+    const r = await fetch("/api/trends");
+    trendData = await r.json();
+  } catch { trendData = { countries: {} }; }
+}
+
+function trendColor(pct) {
+  if (pct == null) return "#475569";
+  const t = Math.min(1, Math.abs(pct) / 100);
+  if (pct >= 0) {
+    const r = Math.round(71 + (244 - 71) * t);
+    const g = Math.round(85 + (63 - 85) * t);
+    const b = Math.round(105 + (94 - 105) * t);
+    return `rgb(${r},${g},${b})`;
+  }
+  const r = Math.round(71 + (34 - 71) * t);
+  const g = Math.round(85 + (197 - 85) * t);
+  const b = Math.round(105 + (94 - 105) * t);
+  return `rgb(${r},${g},${b})`;
 }
 
 function applyChoropleth(events) {
@@ -573,7 +709,22 @@ function applyChoropleth(events) {
   }
   let max = 0;
   sums.forEach(c => { if (c.sum > max) max = c.sum; });
+  const countries = (trendData && trendData.countries) || {};
   isoToLayer.forEach((layer, iso) => {
+    if (state.trend) {
+      const td = countries[iso];
+      if (!td || td.pct == null) {
+        layer.setStyle({ ...CHORO_BASE_STYLE, fillColor: "#1e293b", fillOpacity: 0.35 });
+        layer.setTooltipContent(`<b>${iso}</b><br>${t("ch_no_data")}`);
+        return;
+      }
+      const up = td.pct >= 0;
+      layer.setStyle({ ...CHORO_BASE_STYLE, fillColor: trendColor(td.pct) });
+      layer.setTooltipContent(
+        `<b>${iso}</b><br>${up ? "▲" : "▼"} ${up ? "+" : ""}${td.pct.toFixed(1)}%<br>` +
+        `${fmt(td.current)} vs ${td.prev != null ? fmt(td.prev) : "—"}`);
+      return;
+    }
     const data = sums.get(iso);
     if (!data) {
       layer.setStyle({ ...CHORO_BASE_STYLE, fillColor: "#1e293b", fillOpacity: 0.35 });
@@ -585,7 +736,7 @@ function applyChoropleth(events) {
     layer.setTooltipContent(
       `<b>${iso}</b><br>${fmt(data.sum)} · ${data.count} ${t("ch_events_n")}`);
   });
-  updateChoroplethLegend(max, sums.size);
+  updateChoroplethLegend(state.trend ? 100 : max, sums.size);
 }
 
 function initControls(eventTypes) {
@@ -620,16 +771,37 @@ function initControls(eventTypes) {
   document.getElementById("choroplethToggle").addEventListener("change", async e => {
     state.choropleth = e.target.checked;
     if (state.choropleth) {
+      if (state.trend) await ensureTrend();
       try {
         await loadCountryLayer();
         if (!map.hasLayer(countryLayer)) countryLayer.addTo(map);
         refreshEvents();
       } catch { }
     } else {
+      if (state.trend) {
+        state.trend = false;
+        document.getElementById("trendToggle").checked = false;
+      }
       if (countryLayer && map.hasLayer(countryLayer)) map.removeLayer(countryLayer);
       updateChoroplethLegend(0, 0);
       refreshEvents();
     }
+  });
+  const trendToggle = document.getElementById("trendToggle");
+  if (trendToggle) trendToggle.addEventListener("change", async e => {
+    state.trend = e.target.checked;
+    if (state.trend) {
+      if (!state.choropleth) {
+        state.choropleth = true;
+        document.getElementById("choroplethToggle").checked = true;
+      }
+      await ensureTrend();
+      try {
+        await loadCountryLayer();
+        if (!map.hasLayer(countryLayer)) countryLayer.addTo(map);
+      } catch { }
+    }
+    refreshEvents();
   });
   document.getElementById("langToggle").addEventListener("click", () => {
     LANG = LANG === "es" ? "en" : "es";
@@ -640,6 +812,7 @@ function initControls(eventTypes) {
     populateYears();
     updateSummary();
     updateSources();
+    if (chartsLoaded) { chartsLoaded = false; loadCharts(); }
     refreshEvents();
   });
 }
@@ -760,6 +933,7 @@ async function refreshEvents() {
     heatLayer.addTo(map);
   }
   applyChoropleth(events);
+  if (state.choropleth && state.trend && !trendData) ensureTrend().then(() => applyChoropleth(events));
   document.getElementById("lastUpdate").textContent = `${t("updated")} ${fmtTime(new Date())}`;
 }
 

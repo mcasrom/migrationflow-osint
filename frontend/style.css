@@ -249,6 +249,22 @@ header .sub { font-size: 11px; color: var(--muted); }
   background: linear-gradient(90deg, #fbe6d6, #fec884, #fd8d3c, #d94815, #8c2d04);
 }
 .choropleth-legend .cl-scale { display: flex; justify-content: space-between; margin-top: 3px; color: var(--muted); }
+.choropleth-legend .cl-note { max-width: 170px; margin-top: 4px; line-height: 1.35; color: var(--muted); }
+.choropleth-legend .cl-bar.trend {
+  background: linear-gradient(90deg, #15803d, #22c55e, #475569, #f43f5e, #be123c);
+}
+.chk-nested { margin-left: 18px; font-size: 11px; color: var(--muted); }
+.chart { width: 100%; overflow-x: auto; }
+.chart svg { display: block; }
+.chart-note { font-size: 10px; color: var(--muted); margin: 2px 0 6px; }
+.chart-bars .bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 11px; }
+.chart-bars .bar-label { width: 34px; color: var(--muted); flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chart-bars .bar-track { flex: 1; background: var(--panel-2); border-radius: 3px; height: 12px; overflow: hidden; }
+.chart-bars .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+.chart-bars .bar-val { width: 62px; text-align: right; flex: none; color: var(--text); }
+.chart-legend { display: flex; gap: 12px; font-size: 10px; color: var(--muted); margin: 4px 0 8px; }
+.chart-legend .lg { display: flex; align-items: center; gap: 4px; }
+.chart-legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
 @media (max-width: 720px) {
   #panel { width: min(300px, 82vw); top: 90px; }

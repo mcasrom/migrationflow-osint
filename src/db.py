@@ -88,6 +88,16 @@ def init_db():
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_updated ON events (updated_at)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_events_level ON events (level)")
         cur.execute("""
+            CREATE TABLE IF NOT EXISTS arrivals_series (
+                country_iso3 TEXT NOT NULL,
+                month DATE NOT NULL,
+                value DOUBLE PRECISION NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                PRIMARY KEY (country_iso3, month)
+            )
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_arrivals_series_month ON arrivals_series (month)")
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS collector_runs (
                 id BIGSERIAL PRIMARY KEY,
                 collector TEXT NOT NULL,
@@ -444,6 +454,139 @@ def fetch_summary(year: Optional[int] = None) -> dict:
             "with_value": with_value,
             "sum_value": sum_value,
         }
+    finally:
+        release_conn(conn)
+
+
+def save_arrivals_series(rows: list[tuple]) -> int:
+    """Upsert de la serie mensual de entradas Frontex.
+
+    Cada fila es (country_iso3, month 'YYYY-MM-DD', value). No crea eventos:
+    alimenta la tendencia y los gráficos sin saturar el mapa.
+    """
+    if not rows:
+        return 0
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.executemany(
+            """INSERT INTO arrivals_series (country_iso3, month, value, updated_at)
+               VALUES (%s, %s, %s, now())
+               ON CONFLICT (country_iso3, month) DO UPDATE SET
+                 value = EXCLUDED.value, updated_at = now()""",
+            rows)
+        conn.commit()
+        logger.info("[db] %d puntos de serie mensual (arrivals_series)", len(rows))
+        return len(rows)
+    except Exception as e:
+        conn.rollback()
+        logger.error("[db] save_arrivals_series error: %s", e)
+        raise
+    finally:
+        release_conn(conn)
+
+
+def fetch_arrivals_series(country: Optional[str] = None, months: int = 24) -> dict:
+    """Serie mensual de entradas Frontex; global (suma de países) o por país."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        if country:
+            cur.execute(
+                "SELECT to_char(month, 'YYYY-MM') AS month, value "
+                "FROM arrivals_series WHERE country_iso3=%s "
+                "AND month >= date_trunc('month', now()) - make_interval(months => %s) "
+                "ORDER BY month", (country, int(months)))
+            rows = list(cur.fetchall())
+            return {"country": country, "asof": _series_asof(cur),
+                    "points": [{"month": r["month"], "value": float(r["value"])}
+                               for r in rows]}
+        cur.execute(
+            "SELECT to_char(month, 'YYYY-MM') AS month, round(sum(value)::numeric) AS value "
+            "FROM arrivals_series "
+            "WHERE month >= date_trunc('month', now()) - make_interval(months => %s) "
+            "GROUP BY month ORDER BY month", (int(months),))
+        rows = list(cur.fetchall())
+        return {"country": None, "asof": _series_asof(cur),
+                "points": [{"month": r["month"], "value": float(r["value"])}
+                           for r in rows]}
+    finally:
+        release_conn(conn)
+
+
+def _series_asof(cur) -> Optional[str]:
+    """Último mes completo disponible en arrivals_series (misma conexión)."""
+    cur.execute("SELECT max(month) FROM arrivals_series WHERE month < date_trunc('month', now())")
+    r = cur.fetchone()
+    return r["max"].strftime("%Y-%m") if r and r["max"] else None
+
+
+def fetch_arrivals_trend() -> dict:
+    """Tendencia de entradas por país de origen: acumulado del año actual vs.
+    mismo periodo del año anterior (comparable), a partir de la serie mensual."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            WITH asof AS (SELECT max(month) AS m FROM arrivals_series
+                          WHERE month < date_trunc('month', now())),
+            cur AS (
+                SELECT country_iso3, sum(value) AS v FROM arrivals_series, asof
+                WHERE month >= date_trunc('year', now()) AND month <= asof.m
+                GROUP BY country_iso3
+            ),
+            prev AS (
+                SELECT country_iso3, sum(value) AS v FROM arrivals_series, asof
+                WHERE month >= date_trunc('year', now()) - make_interval(years => 1)
+                  AND month <= asof.m - make_interval(years => 1)
+                GROUP BY country_iso3
+            )
+            SELECT c.country_iso3 AS iso3, c.v AS current_value, p.v AS prev_value
+            FROM cur c LEFT JOIN prev p ON p.country_iso3 = c.country_iso3
+        """)
+        countries = {}
+        for r in cur.fetchall():
+            c = float(r["current_value"])
+            p = float(r["prev_value"]) if r["prev_value"] is not None else None
+            pct = None if p is None or p == 0 else round((c - p) / p * 100, 1)
+            countries[r["iso3"]] = {"current": c, "prev": p, "pct": pct}
+        return {"asof": _series_asof(cur), "countries": countries}
+    finally:
+        release_conn(conn)
+
+
+def fetch_monthly_incidents(months: int = 12) -> list[dict]:
+    """Serie mensual de incidentes missing (count y muertes) en los últimos N meses."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT to_char(reported_at, 'YYYY-MM') AS month, count(*) AS n, "
+            "coalesce(round(sum(value)::numeric), 0) AS deaths "
+            "FROM events WHERE status='active' AND event_type='missing' "
+            "AND reported_at >= date_trunc('month', now()) - make_interval(months => %s) "
+            "GROUP BY 1 ORDER BY 1", (int(months),))
+        return [{"month": r["month"], "count": r["n"], "deaths": float(r["deaths"])}
+                for r in cur.fetchall()]
+    finally:
+        release_conn(conn)
+
+
+def fetch_top_countries(limit: int = 10) -> list[dict]:
+    """Top países por personas afectadas (último snapshot por tipo de stock)."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT iso3, country, round(sum(value)::numeric) AS value FROM ("
+            "SELECT DISTINCT ON (iso3, event_type) iso3, country, value "
+            "FROM events WHERE status='active' AND value IS NOT NULL "
+            "AND event_type IN "
+            "('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "ORDER BY iso3, event_type, reported_at DESC) t "
+            "GROUP BY iso3, country ORDER BY value DESC LIMIT %s", (int(limit),))
+        return [{"iso3": r["iso3"], "country": r["country"], "value": float(r["value"])}
+                for r in cur.fetchall()]
     finally:
         release_conn(conn)
 

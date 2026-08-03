@@ -88,6 +88,32 @@ def api_status():
     return {"collectors": fetch_status(), "event_types": EVENT_TYPES}
 
 
+@app.get("/api/arrivals/series")
+def api_arrivals_series(
+    country: Optional[str] = Query(None, description="ISO3 (vacío = serie global)"),
+    months: int = Query(24, ge=1, le=48),
+):
+    return db.fetch_arrivals_series(country=country.strip().upper() if country else None,
+                                    months=months)
+
+
+@app.get("/api/trends")
+def api_trends():
+    """Tendencia de entradas Frontex por país (YTD actual vs. mismo periodo previo)."""
+    return db.fetch_arrivals_trend()
+
+
+@app.get("/api/charts")
+def api_charts():
+    """Datos del panel de gráficos: serie mensual de incidentes, entradas y top países."""
+    return {
+        "monthly_incidents": db.fetch_monthly_incidents(),
+        "monthly_arrivals": db.fetch_arrivals_series(months=24)["points"],
+        "arrivals_trend": db.fetch_arrivals_trend(),
+        "top_countries": db.fetch_top_countries(),
+    }
+
+
 @app.post("/api/verify")
 async def api_verify(request: Request):
     """Verificador de bulos: cruza un claim con bulos curados y eventos reales."""

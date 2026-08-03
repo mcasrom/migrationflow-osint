@@ -47,12 +47,14 @@
   <div id="choroplethLegend" class="choropleth-legend hidden">
     <div class="cl-title"></div>
     <div class="cl-bar"></div>
-    <div class="cl-scale"><span class="cl-min"></span><span class="cl-max"></span></div>
+    <div class="cl-scale"><span class="cl-min"></span><span class="cl-mid"></span><span class="cl-max"></span></div>
+    <div class="cl-note"></div>
   </div>
 
   <aside id="panel">
     <div class="tabs">
       <button id="tab-data" class="tab active" data-i18n="tab_data">Datos</button>
+      <button id="tab-charts" class="tab" data-i18n="tab_charts">Gráficos</button>
       <button id="tab-info" class="tab" data-i18n="tab_info">Fuentes</button>
       <button id="tab-about" class="tab" data-i18n="tab_about">Acerca de</button>
     </div>
@@ -77,6 +79,7 @@
         <label class="chk"><input type="checkbox" id="darkToggle" checked> <span data-i18n="dark">Tema oscuro</span></label>
         <label class="chk"><input type="checkbox" id="routesToggle"> <span data-i18n="routes">Rutas migratorias (aprox.)</span></label>
         <label class="chk"><input type="checkbox" id="choroplethToggle"> <span data-i18n="choropleth">Mapa por países (choropleth)</span></label>
+        <label class="chk chk-nested"><input type="checkbox" id="trendToggle"> <span data-i18n="trend">Tendencia (▲▼ entradas Frontex)</span></label>
       </section>
 
       <section class="panel-section">
@@ -108,6 +111,23 @@
           <button id="alertsTestBtn" class="btn-ghost" data-i18n="alerts_test">Enviar notificación de prueba</button>
           <div id="alertsStatus" class="alerts-status"></div>
         </div>
+      </section>
+    </div>
+
+    <div id="pane-charts" class="hidden">
+      <section class="panel-section">
+        <h2 data-i18n="ch_incidents">Muertes/desapariciones por mes (incidentes)</h2>
+        <div id="chartIncidents" class="chart" data-i18n="loading">Cargando…</div>
+      </section>
+      <section class="panel-section">
+        <h2 data-i18n="ch_arrivals">Entradas irregulares (Frontex) por mes</h2>
+        <p class="chart-note" data-i18n="ch_arrivals_note">Detecciones globales mensuales (todas las rutas) · última actualización {m}</p>
+        <div id="chartArrivals" class="chart" data-i18n="loading">Cargando…</div>
+      </section>
+      <section class="panel-section">
+        <h2 data-i18n="ch_top">Países más afectados</h2>
+        <p class="chart-note" data-i18n="ch_top_note">Suma del último dato por tipo (refugiados, asilo, desplazamiento, IDP)</p>
+        <div id="chartTop" class="chart" data-i18n="loading">Cargando…</div>
       </section>
     </div>
 
