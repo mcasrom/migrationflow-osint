@@ -144,6 +144,17 @@ Geocoding fino: `src/geocode.py` (gazetteer + Photon + cache, datos `data/gazett
 - [ ] Evitar doble conteo en el choropleth cuando el filtro de año es "todos" (hoy suma todos los snapshots
       del período por tipo por país; el popup ya no lo hace).
 
+### Sprint posterior — P4 (lanzamiento y difusión, anotado)
+- [ ] **Reddit**: perfil de proyecto + posts con el mapa y la demo en r/migrationpolicy, r/openstreetmap,
+      r/dataisbeautiful, r/gis y subreddits de datos abiertos (formato imagen estática + enlace).
+- [ ] **Product Hunt**: preparar el "hunt" (galería, descripción, maker comment, FAQ) y plan de votos.
+- [ ] **Show HN / GitHub**: caso de estudio en Hacker News y destacar el repo con README demo.
+- [ ] **X / Telegram**: hilo de lanzamiento con capturas del mapa, tendencias Frontex y verificación de bulos.
+- [ ] **SEO para búsquedas globales**: ya hecho el paquete base (`robots.txt`, `sitemap.xml`, canonical,
+      JSON-LD WebApplication/WebSite/Dataset, contenido crawlable y CTA en portada); pendiente de
+      re-rastreo de Google y monitorización del estado de indexación.
+- [ ] **Material para compartir**: vídeo/gif de 30s de la demo + tarjetas sociales reutilizables.
+
 ## 5. Problemas conocidos
 
 - **Sampling CPU headless**: no aplica.
