@@ -4,32 +4,108 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Seguimiento abierto de flujos migratorios y desplazamiento forzado a partir de datos públicos de UNHCR, IDMC, IOM, Frontex, Caminando Fronteras y ReliefWeb.">
-<title>MigrationFlow OSINT</title>
+<meta name="description" content="Flujos migratorios y desplazamiento forzado a escala global: mapa interactivo con datos abiertos de UNHCR, IDMC, IOM, Frontex, Caminando Fronteras y ReliefWeb, actualizado automáticamente.">
+<meta name="author" content="MigrationFlow OSINT">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="migración, refugiados, desplazados, Frontex, UNHCR, IDMC, IOM, crisis migratoria, OSINT, mapa migratorio, llegadas por mar">
+<title>MigrationFlow OSINT — Mapa global de flujos migratorios y desplazamiento forzado</title>
+<link rel="canonical" href="https://migrationflow.viajeinteligencia.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MigrationFlow OSINT">
-<meta property="og:title" content="MigrationFlow OSINT">
+<meta property="og:title" content="MigrationFlow OSINT — Mapa global de flujos migratorios y desplazamiento forzado">
 <meta property="og:description" content="Flujos migratorios y desplazamiento forzado a escala global. Seguimiento abierto con datos públicos de UNHCR, IDMC, IOM, Frontex, Caminando Fronteras y ReliefWeb, actualizado automáticamente.">
 <meta property="og:url" content="https://migrationflow.viajeinteligencia.com/">
 <meta property="og:image" content="https://migrationflow.viajeinteligencia.com/og.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="MigrationFlow OSINT — mapa global de flujos migratorios y desplazamiento forzado">
 <meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MigrationFlow OSINT">
+<meta name="twitter:title" content="MigrationFlow OSINT — Mapa global de flujos migratorios y desplazamiento forzado">
 <meta name="twitter:description" content="Flujos migratorios y desplazamiento forzado a escala global. Seguimiento abierto con datos públicos de UNHCR, IDMC, IOM, Frontex, Caminando Fronteras y ReliefWeb.">
 <meta name="twitter:image" content="https://migrationflow.viajeinteligencia.com/og.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "MigrationFlow OSINT",
+      "url": "https://migrationflow.viajeinteligencia.com/",
+      "applicationCategory": "DataVisualizationApplication",
+      "operatingSystem": "Any",
+      "inLanguage": ["es", "en"],
+      "description": "Seguimiento abierto de flujos migratorios y desplazamiento forzado a escala global a partir de datos públicos de UNHCR, IDMC, IOM, Frontex, Caminando Fronteras, Missing Migrants Project y ReliefWeb. Mapa interactivo, tendencias y verificación de afirmaciones.",
+      "featureList": "Mapa interactivo de eventos migratorios, modo tendencia de llegadas Frontex, gráficos de series temporales, verificación de afirmaciones (bulos), datos abiertos y exportación GeoJSON/CSV.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "sameAs": "https://github.com/mcasrom/migrationflow-osint",
+      "publisher": {
+        "@type": "Organization",
+        "name": "MigrationFlow OSINT",
+        "url": "https://migrationflow.viajeinteligencia.com/",
+        "sameAs": ["https://github.com/mcasrom/migrationflow-osint", "https://ko-fi.com/m_castillo"]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "name": "MigrationFlow OSINT",
+      "url": "https://migrationflow.viajeinteligencia.com/",
+      "inLanguage": "es",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://migrationflow.viajeinteligencia.com/?claim={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "MigrationFlow OSINT — evento migratorios a escala global",
+      "url": "https://migrationflow.viajeinteligencia.com/",
+      "description": "Serie de eventos de desplazamiento forzado y flujos migratorios agregados y geolocalizados a partir de fuentes públicas (UNHCR, IDMC, IOM, Frontex, Caminando Fronteras, Missing Migrants Project y ReliefWeb).",
+      "inLanguage": "es",
+      "isAccessibleForFree": true,
+      "license": "https://github.com/mcasrom/migrationflow-osint",
+      "creator": { "@type": "Organization", "name": "MigrationFlow OSINT", "url": "https://github.com/mcasrom/migrationflow-osint" }
+    }
+  ]
+}
+</script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<noscript>
+  <div class="seo-fallback">
+    <h2>El mundo en movimiento, en un mapa</h2>
+    <p><strong>MigrationFlow OSINT</strong> es un seguimiento abierto de flujos migratorios y desplazamiento forzado a escala global, construido con datos públicos de UNHCR, IDMC, IOM DTM, Missing Migrants Project, Frontex, Caminando Fronteras y ReliefWeb. Cada punto del mapa es un evento real geolocalizado y clasificado por severidad, actualizado automáticamente dos veces al día.</p>
+    <h3>Qué puedes hacer</h3>
+    <ul>
+      <li>Explorar en el mapa los eventos migratorios y de desplazamiento por país, tipo y nivel de severidad.</li>
+      <li>Comparar la tendencia de llegadas por frontera (modo tendencia, datos Frontex).</li>
+      <li>Consultar series temporales y gráficos por país de origen.</li>
+      <li>Verificar afirmaciones sobre migración (¿es un bulo?).</li>
+      <li>Exportar los datos en GeoJSON o CSV.</li>
+    </ul>
+    <p class="seo-cta">
+      <a class="btn-primary" href="/">Explorar el mapa</a>
+      <a href="/docs">Documentación de la API</a> ·
+      <a href="https://github.com/mcasrom/migrationflow-osint" rel="noopener">Código fuente</a> ·
+      <a href="https://ko-fi.com/m_castillo" rel="noopener">Apoyar el proyecto</a>
+    </p>
+    <p class="seo-foot-note">Datos abiertos · Código abierto · Sin ánimo de lucro</p>
+  </div>
+</noscript>
 <header>
   <h1>MigrationFlow <span>OSINT</span></h1>
   <div class="sub" data-i18n="sub">Flujos migratorios y desplazamiento forzado a escala global</div>
@@ -247,6 +323,15 @@
     </footer>
   </aside>
 </main>
+
+<footer class="seo-foot">
+  <span class="seo-foot-txt">Datos abiertos: UNHCR · IDMC · IOM DTM · Missing Migrants · Frontex · Caminando Fronteras · ReliefWeb</span>
+  <span class="seo-foot-links">
+    <a href="/docs" data-i18n="api_docs">Documentación de la API</a>
+    <a href="https://github.com/mcasrom/migrationflow-osint" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://ko-fi.com/m_castillo" target="_blank" rel="noopener"><span data-i18n="koofi">Apoyar en Ko-fi ☕</span></a>
+  </span>
+</footer>
 
 <div id="intro" class="intro">
   <div class="intro-card">
