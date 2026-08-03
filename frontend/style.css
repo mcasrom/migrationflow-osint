@@ -165,6 +165,8 @@ header .sub { font-size: 11px; color: var(--muted); }
 .summary .dot, .sources .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
 .ok { color: #4ade80; } .err { color: var(--critical); }
 .foot { font-size: 10px; color: var(--muted); margin-top: 10px; text-align: center; }
+.ph-badge { text-align: center; margin-top: 8px; }
+.ph-badge img { max-width: 100%; height: auto; border-radius: 8px; }
 .seo-foot {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 1050;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
