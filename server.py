@@ -116,19 +116,26 @@ def api_charts():
 
 @app.post("/api/verify")
 async def api_verify(request: Request):
-    """Verificador de bulos: cruza un claim con bulos curados y eventos reales."""
+    """Verificador de bulos: cruza un claim (texto o URL) con bulos curados y eventos reales."""
     body = await request.json()
+    lang = "es" if (body.get("lang") or "es") != "en" else "en"
     q = (body.get("q") or "").strip()
+    url = (body.get("url") or "").strip()
+    fetched = None
+    if not q and bulos.is_url(url):
+        fetched = bulos.fetch_claim(url)
+        if fetched:
+            q = f"{fetched['title']} {fetched['description']}".strip()
     if not q:
-        raise HTTPException(status_code=400, detail="Falta el parámetro q")
+        raise HTTPException(status_code=400, detail="Falta el parámetro q (texto o url)")
     if len(q) > 500:
         q = q[:500]
-    lang = "es" if (body.get("lang") or "es") != "en" else "en"
     matches = bulos.check_bulos(q)
     events = db.search_events(q, limit=8)
     return {
         "query": q,
         "lang": lang,
+        "fetched": fetched,
         "matches": matches,
         "events": events,
         "links": [

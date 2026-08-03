@@ -11,9 +11,14 @@ Los textos son revisados manualmente y apuntan a fuentes verificadoras
 """
 
 import re
+import socket
 import unicodedata
+from ipaddress import ip_address
+
+import httpx
 
 from src import db
+from src.config import HTTP_TIMEOUT, USER_AGENT
 
 
 def _norm(s: str) -> str:
@@ -25,12 +30,19 @@ def _tokens(s: str) -> list[str]:
     return [t for t in re.split(r"[^a-z0-9]+", _norm(s)) if len(t) >= 3]
 
 
-def _hits(tokens: list[str], keywords: list[str]) -> list[str]:
+def _hits(tokens: list[str], keywords: list[str], raw_norm: str = "") -> list[str]:
     kw = sorted({_norm(k) for k in keywords}, key=len, reverse=True)
     hits = []
-    for t in tokens:
-        for k in kw:
-            if t.startswith(k) or k.startswith(t):
+    for k in kw:
+        if " " in k:
+            if raw_norm and k in raw_norm:   # frase: aparece contigua en el texto
+                hits.append(k)
+            continue
+        for t in tokens:
+            if t == k:
+                hits.append(k)
+                break
+            if len(k) >= 4 and abs(len(t) - len(k)) <= 3 and (t.startswith(k) or k.startswith(t)):
                 hits.append(k)
                 break
     return hits
@@ -40,7 +52,7 @@ def _hits(tokens: list[str], keywords: list[str]) -> list[str]:
 BULOS = [
     {
         "id": "ayudas-400-900",
-        "keywords": ["400", "900", "ayuda", "subvencion", "cobran", "ingreso", "paga", "prestacion", "renta"],
+        "keywords": ["400", "900", "ayuda", "subvencion", "cobran", "ingreso", "prestacion", "renta"],
         "title": {"es": "Los inmigrantes cobran ayudas de 400-900 € por el hecho de ser inmigrantes",
                   "en": "Migrants get €400-900 in benefits just for being migrants"},
         "claim": {"es": "Se repite cada cierto tiempo. En España no existe una prestación universal por ser inmigrante.",
@@ -122,6 +134,112 @@ BULOS = [
             {"label": "Newtral", "url": "https://www.newtral.es/"},
         ],
     },
+    {
+        "id": "imv-sin-requisitos",
+        "keywords": ["imv", "ingreso minimo vital", "renta garantizada", "cobran el imv"],
+        "title": {"es": "Los inmigrantes cobran el Ingreso Mínimo Vital (IMV) sin cumplir requisitos",
+                  "en": "Migrants receive the Minimum Vital Income without meeting requirements"},
+        "claim": {"es": "Falso: el IMV exige cumplir requisitos (residencia, vulnerabilidad, patrimonio) que aplican a toda la ciudadanía.",
+                  "en": "False: the IMV requires meeting conditions (residence, vulnerability, assets) that apply to all citizens."},
+        "evidence": {"es": "El IMV es una prestación de la Seguridad Social accesible a cualquier residente que cumpla los requisitos de vulnerabilidad; no se concede por nacionalidad y cada solicitud se revisa individualmente.",
+                     "en": "IMV is a social-security benefit open to any resident meeting vulnerability criteria; it is not granted by nationality and each application is assessed individually."},
+        "sources": [
+            {"label": "Seguridad Social · IMV", "url": "https://www.seg-social.es/"},
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+        ],
+    },
+    {
+        "id": "retorno-voluntario",
+        "keywords": ["retorno voluntario", "vuelta a su pais", "pagan por irse", "pagan por volver",
+                     "se vayan a su pais", "pago por marcharse"],
+        "title": {"es": "España paga miles de euros a los inmigrantes para que se marchen",
+                  "en": "Spain pays migrants thousands of euros to leave"},
+        "claim": {"es": "La ayuda al retorno voluntario existe pero es voluntaria, menor y sujeta a requisitos; las cifras virales son falsas.",
+                  "en": "Voluntary-return support exists but is voluntary, modest and conditional; viral figures are false."},
+        "evidence": {"es": "El programa de apoyo al retorno voluntario financia el viaje de vuelta y, en su caso, una pequeña ayuda de reintegración muy inferior a las cifras difundidas; es un derecho del interesado, no un pago por expulsarse.",
+                     "en": "Voluntary-return support funds the journey home and, where applicable, a small reintegration allowance far below circulated figures; it is a right of the applicant, not a payment to leave."},
+        "sources": [
+            {"label": "Ministerio de Inclusión", "url": "https://www.inclusion.gob.es/"},
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+        ],
+    },
+    {
+        "id": "vivienda-prioridad",
+        "keywords": ["vivienda publica", "vpo", "proteccion oficial", "piso protegido",
+                     "prioridad de acceso", "vivienda protegida", "cupo de vivienda"],
+        "title": {"es": "Los inmigrantes tienen prioridad en la vivienda pública u ocupan pisos protegidos",
+                  "en": "Migrants have priority access to public housing or squat in protected flats"},
+        "claim": {"es": "No hay cupos ni prioridad por nacionalidad en el acceso a vivienda protegida.",
+                  "en": "There are no quotas or nationality-based priority rules for protected housing."},
+        "evidence": {"es": "El acceso a vivienda protegida se regula por empadronamiento, renta y situación personal, no por nacionalidad; la ocupación ilegal es un delito tipificado con independencia de la procedencia.",
+                     "en": "Access to protected housing depends on registration, income and personal situation, not nationality; illegal squatting is a criminal offence regardless of origin."},
+        "sources": [
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+            {"label": "Newtral", "url": "https://www.newtral.es/"},
+        ],
+    },
+    {
+        "id": "empleo-quitan",
+        "keywords": ["quitan el trabajo", "roban el empleo", "quitan los puestos",
+                     "no quieren trabajar", "vienen a vivir de", "quitan trabajo"],
+        "title": {"es": "Los inmigrantes quitan el trabajo a los españoles o viven de las ayudas sin trabajar",
+                  "en": "Migrants steal jobs from Spaniards or live on benefits without working"},
+        "claim": {"es": "No hay evidencia de que la inmigración reduzca el empleo de la población nativa.",
+                  "en": "There is no evidence that immigration reduces native employment."},
+        "evidence": {"es": "Los estudios económicos no muestran una relación causal entre inmigración y desempleo local; los inmigrantes ocupan con frecuencia nichos con vacantes (agricultura, cuidados, hostelería) y cotizan al sistema.",
+                     "en": "Economic studies show no causal link between immigration and local unemployment; migrants often fill labour shortages (farming, care, hospitality) and contribute to the system."},
+        "sources": [
+            {"label": "FEDEA", "url": "https://www.fedea.net/"},
+            {"label": "OIT", "url": "https://www.ilo.org/"},
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+        ],
+    },
+    {
+        "id": "inmigracion-criminalidad",
+        "keywords": ["criminalidad", "delincuencia", "delitos", "violaciones", "agresiones",
+                     "seguridad ciudadana", "oleada de"],
+        "title": {"es": "La inmigración dispara la criminalidad",
+                  "en": "Immigration drives up crime"},
+        "claim": {"es": "Los datos oficiales no respaldan esa correlación; la criminalidad depende de factores socioeconómicos.",
+                  "en": "Official data do not support that correlation; crime depends on socio-economic factors."},
+        "evidence": {"es": "Las estadísticas del Ministerio del Interior y Eurostat no constatan una relación causal entre inmigración y delitos; los bulos suelen generalizar casos aislados.",
+                     "en": "Interior Ministry and Eurostat statistics show no causal link between immigration and crime; hoaxes usually generalise isolated cases."},
+        "sources": [
+            {"label": "Ministerio del Interior", "url": "https://www.interior.gob.es/"},
+            {"label": "Eurostat", "url": "https://ec.europa.eu/eurostat/"},
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+        ],
+    },
+    {
+        "id": "sanidad-saturada",
+        "keywords": ["saturan la sanidad", "colapsan la sanidad", "sanidad gratis", "tarjeta sanitaria",
+                     "usar la sanidad", "sanidad para extranjeros"],
+        "title": {"es": "Los inmigrantes saturan la sanidad pública y la usan gratis",
+                  "en": "Migrants overwhelm the public health system and use it for free"},
+        "claim": {"es": "El uso sanitario de los inmigrantes es similar o inferior al de la población general.",
+                  "en": "Migrants' health-system use is similar to or lower than the general population's."},
+        "evidence": {"es": "Los estudios sobre utilización de servicios sanitarios muestran un consumo comparable o inferior al de la población autóctona en muchos casos; el derecho a asistencia se regula por residencia y padrón, no por nacionalidad.",
+                     "en": "Studies of health-service use show comparable or lower consumption than the native population in many cases; the right to care depends on residence and registration, not nationality."},
+        "sources": [
+            {"label": "Ministerio de Sanidad", "url": "https://www.sanidad.gob.es/"},
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+        ],
+    },
+    {
+        "id": "pateras-subvencionadas",
+        "keywords": ["pateras", "subvencionad", "pagan por venir", "vienen pagados",
+                     "pagan por llegar", "migracion subvencionada"],
+        "title": {"es": "Las pateras y la inmigración están subvencionadas",
+                  "en": "Boats and immigration are government-funded"},
+        "claim": {"es": "No hay subvención a la inmigración irregular ni pagos por llegar en patera.",
+                  "en": "There is no funding for irregular migration nor payments for arriving by boat."},
+        "evidence": {"es": "El tránsito irregular no está financiado por el Estado; quienes llegan pagan a redes de tráfico de personas. Las organizaciones humanitarias rescatan y asisten, no 'pagan' por la llegada.",
+                     "en": "Irregular transit is not state-funded; those who arrive pay people-smuggling networks. Humanitarian organisations rescue and assist — they do not pay people to come."},
+        "sources": [
+            {"label": "Maldita.es · Migración", "url": "https://maldita.es/migracion/"},
+            {"label": "Guardia Civil", "url": "https://www.guardiacivil.es/"},
+        ],
+    },
 ]
 
 
@@ -169,14 +287,93 @@ def _match_keywords(text: str) -> list[str]:
     return _tokens(text)
 
 
+# ── Verificación por URL (share-link) ────────────────────────────
+_URL_RE = re.compile(r"^https?://", re.IGNORECASE)
+_MAX_FETCH_BYTES = 400_000
+_MAX_REDIRECTS = 3
+
+_OG_TITLE_RE = re.compile(r'<meta[^>]+property=["\']og:title["\'][^>]*content=["\']([^"\']+)["\']', re.IGNORECASE | re.DOTALL)
+_TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+_OG_DESC_RE = re.compile(r'<meta[^>]+property=["\']og:description["\'][^>]*content=["\']([^"\']+)["\']', re.IGNORECASE | re.DOTALL)
+_META_DESC_RE = re.compile(r'<meta[^>]+name=["\']description["\'][^>]*content=["\']([^"\']+)["\']', re.IGNORECASE | re.DOTALL)
+
+
+def is_url(text: str) -> bool:
+    return bool(_URL_RE.match((text or "").strip()))
+
+
+def _is_public_host(host: str) -> bool:
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except socket.gaierror:
+        return False
+    for info in infos:
+        try:
+            ip = ip_address(info[4][0])
+        except ValueError:
+            return False
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+            return False
+    return bool(infos)
+
+
+def _clean_meta(raw: str) -> str:
+    raw = re.sub(r"<[^>]+>", " ", raw or "")
+    return re.sub(r"\s+", " ", raw).strip()
+
+
+def fetch_claim(url: str, max_bytes: int = _MAX_FETCH_BYTES) -> dict | None:
+    """Descarga una URL pública y extrae título + descripción para verificar un claim.
+
+    Con guardia anti-SSRF: rechaza hosts que resuelvan a IPs privadas/loopback y
+    valida cada redirección. Devuelve None si no es segura o no hay texto útil.
+    """
+    url = (url or "").strip()
+    if not is_url(url):
+        return None
+    current = url
+    for _ in range(_MAX_REDIRECTS + 1):
+        try:
+            host = httpx.URL(current).host
+        except ValueError:
+            return None
+        if not host or not _is_public_host(host):
+            return None
+        try:
+            r = httpx.get(current, timeout=HTTP_TIMEOUT, follow_redirects=False,
+                          headers={"User-Agent": USER_AGENT})
+            r.raise_for_status()
+        except httpx.HTTPError:
+            return None
+        if r.is_redirect and r.headers.get("location"):
+            current = str(httpx.URL(current).join(r.headers["location"]))
+            continue
+        break
+    html = r.text[:max_bytes]
+    title = ""
+    for pat in (_OG_TITLE_RE, _TITLE_RE, _META_DESC_RE):
+        m = pat.search(html)
+        if m:
+            title = _clean_meta(m.group(1))
+            break
+    desc = ""
+    for pat in (_OG_DESC_RE, _META_DESC_RE):
+        m = pat.search(html)
+        if m:
+            desc = _clean_meta(m.group(1))
+            break
+    return {"title": title, "description": desc, "final_url": current}
+
+
 def check_bulos(text: str) -> list[dict]:
     """Devuelve los bulos curados cuyas keywords coinciden con `text`."""
     if not text:
         return []
     tok = _match_keywords(text)
+    raw_norm = _norm(text)
     results = []
     for b in BULOS:
-        hits = _hits(tok, b["keywords"])
+        hits = _hits(tok, b["keywords"], raw_norm)
         if hits:
             results.append({"id": b["id"], "title": b["title"], "claim": b["claim"],
                             "evidence": b["evidence"], "sources": b["sources"],

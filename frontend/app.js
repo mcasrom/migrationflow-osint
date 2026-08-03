@@ -94,17 +94,23 @@ function initInstall() {
   });
 }
 
-async function runVerify(q) {
+async function runVerify(raw) {
   const out = document.getElementById("verifyOut");
+  const q = String(raw || "").trim();
   if (!q) return;
   out.innerHTML = `<div class="v-loading">${t("verify_loading")}</div>`;
   let data;
   try {
-    const r = await fetch("/api/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ q, lang: LANG }) });
+    const isUrl = /^https?:\/\//i.test(q);
+    const r = await fetch("/api/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(isUrl ? { url: q, lang: LANG } : { q, lang: LANG }) });
     if (!r.ok) { out.innerHTML = ""; return; }
     data = await r.json();
   } catch { out.innerHTML = ""; return; }
   let html = "";
+  if (data.fetched) {
+    html += `<div class="v-sub">${t("verify_url_src")}</div>`;
+    html += `<div class="v-row">${esc(data.fetched.title || data.fetched.final_url)}</div>`;
+  }
   if (data.matches && data.matches.length) {
     html += `<div class="v-sub">${t("verify_matches")}</div>`;
     for (const m of data.matches) {
@@ -143,6 +149,11 @@ function initVerifier() {
   const go = () => runVerify(input.value.trim());
   btn.addEventListener("click", go);
   input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  const claim = new URLSearchParams(location.search).get("claim");
+  if (claim) {
+    input.value = claim;
+    go();
+  }
 }
 
 function urlBase64ToUint8Array(base64String) {

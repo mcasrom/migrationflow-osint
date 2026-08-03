@@ -33,7 +33,7 @@ Todas **públicas y sin autenticación**.
 | Missing Migrants Project (HDX) | incidentes con muertos/desaparecidos (coordenadas) | CSV en `data.humdata.org` | semanal |
 | Frontex | entradas irregulares anuales por país y mensuales por ruta | ArcGIS REST `services9.arcgis.com/dujMioKFm7jZpirQ/.../DetectionsOfIBCs` | semanal (detecciones, no personas únicas) |
 | Caminando Fronteras | víctimas mortales en rutas hacia España (curado) | RSS `caminandofronteras.org/search/monitoreo/feed/rss2/` | cada informe (override en `data/cf_override.json`) |
-| ReliefWeb | noticias y alertas humanitarias | RSS `reliefweb.int/updates/rss.xml` | diaria |
+| ReliefWeb | noticias y alertas humanitarias | RSS `reliefweb.int/updates/rss.xml` (geolocalización fina: gazetteer local + Photon) | diaria |
 
 ## Arquitectura
 
@@ -79,7 +79,7 @@ data/countries_geo.json  centroides ISO3 (250 países)
 | `/api/trends` | tendencia de entradas por país (YTD actual vs. mismo periodo previo, % variación) |
 | `/api/charts` | datos del panel de gráficos (incidentes mensuales, entradas mensuales, top países) |
 | `/api/context?q=&lang=` | tarjetas de contexto (cruza bulos + datos reales) para un claim |
-| `/api/verify` (POST `{q, lang}`) | verificador de bulos: matches curados + eventos reales + fact-checkers |
+| `/api/verify` (POST) | verificador de bulos: `{"q": texto}` o `{"url": …}` (descarga la URL, extrae el claim y lo cruza con bulos curados, eventos reales y fact-checkers) |
 | `/api/status` | estado por colector + tipos de evento |
 | `/api/push/*` | suscripción/alta VAPID para notificaciones push |
 | `/health` | healthcheck |

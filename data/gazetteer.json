@@ -1,0 +1,1778 @@
+[
+ {
+  "place": "Lampedusa",
+  "iso3": "ITA",
+  "lat": 35.5111,
+  "lon": 12.5963
+ },
+ {
+  "place": "Sicily",
+  "iso3": "ITA",
+  "lat": 37.5878,
+  "lon": 14.155
+ },
+ {
+  "place": "Pozzallo",
+  "iso3": "ITA",
+  "lat": 36.7265,
+  "lon": 14.8466
+ },
+ {
+  "place": "Taranto",
+  "iso3": "ITA",
+  "lat": 40.5488,
+  "lon": 17.0806
+ },
+ {
+  "place": "Bari",
+  "iso3": "ITA",
+  "lat": 41.1258,
+  "lon": 16.862
+ },
+ {
+  "place": "Augusta",
+  "iso3": "ITA",
+  "lat": 37.2369,
+  "lon": 15.2197
+ },
+ {
+  "place": "Ventimiglia",
+  "iso3": "ITA",
+  "lat": 43.8265,
+  "lon": 7.5495
+ },
+ {
+  "place": "Lesbos",
+  "iso3": "GRC",
+  "lat": 39.1758,
+  "lon": 25.9989
+ },
+ {
+  "place": "Chios",
+  "iso3": "GRC",
+  "lat": 38.3758,
+  "lon": 26.0647
+ },
+ {
+  "place": "Samos",
+  "iso3": "GRC",
+  "lat": 37.7246,
+  "lon": 26.8193
+ },
+ {
+  "place": "Kos",
+  "iso3": "GRC",
+  "lat": 36.7937,
+  "lon": 27.0848
+ },
+ {
+  "place": "Leros",
+  "iso3": "GRC",
+  "lat": 37.9934,
+  "lon": 23.5389
+ },
+ {
+  "place": "Rhodes",
+  "iso3": "GRC",
+  "lat": 36.1725,
+  "lon": 27.9194
+ },
+ {
+  "place": "Crete",
+  "iso3": "GRC",
+  "lat": 35.3085,
+  "lon": 24.4633
+ },
+ {
+  "place": "Evros",
+  "iso3": "GRC",
+  "lat": 40.4509,
+  "lon": 25.5713
+ },
+ {
+  "place": "Idomeni",
+  "iso3": "GRC",
+  "lat": 41.128,
+  "lon": 22.501
+ },
+ {
+  "place": "Moria",
+  "iso3": "GRC",
+  "lat": 39.1321,
+  "lon": 26.517
+ },
+ {
+  "place": "Ceuta",
+  "iso3": "ESP",
+  "lat": 35.8884,
+  "lon": -5.3041
+ },
+ {
+  "place": "Melilla",
+  "iso3": "ESP",
+  "lat": 35.2919,
+  "lon": -2.9407
+ },
+ {
+  "place": "Algeciras",
+  "iso3": "ESP",
+  "lat": 36.1312,
+  "lon": -5.4474
+ },
+ {
+  "place": "Tarifa",
+  "iso3": "ESP",
+  "lat": 36.0129,
+  "lon": -5.605
+ },
+ {
+  "place": "Cadiz",
+  "iso3": "ESP",
+  "lat": 36.5297,
+  "lon": -6.2929
+ },
+ {
+  "place": "Gran Canaria",
+  "iso3": "ESP",
+  "lat": 27.958,
+  "lon": -15.6062
+ },
+ {
+  "place": "Tenerife",
+  "iso3": "ESP",
+  "lat": 28.2936,
+  "lon": -16.6214
+ },
+ {
+  "place": "El Hierro",
+  "iso3": "ESP",
+  "lat": 27.7435,
+  "lon": -18.0382
+ },
+ {
+  "place": "Lanzarote",
+  "iso3": "ESP",
+  "lat": 29.0397,
+  "lon": -13.6363
+ },
+ {
+  "place": "Fuerteventura",
+  "iso3": "ESP",
+  "lat": 28.4004,
+  "lon": -14.0049
+ },
+ {
+  "place": "Almeria",
+  "iso3": "ESP",
+  "lat": 36.8686,
+  "lon": -2.312
+ },
+ {
+  "place": "Cartagena",
+  "iso3": "ESP",
+  "lat": 37.6155,
+  "lon": -0.9875
+ },
+ {
+  "place": "Motril",
+  "iso3": "ESP",
+  "lat": 36.7451,
+  "lon": -3.5208
+ },
+ {
+  "place": "Malaga",
+  "iso3": "ESP",
+  "lat": 36.7648,
+  "lon": -4.4422
+ },
+ {
+  "place": "Valencia",
+  "iso3": "ESP",
+  "lat": 39.4697,
+  "lon": -0.3763
+ },
+ {
+  "place": "Calais",
+  "iso3": "FRA",
+  "lat": 50.9525,
+  "lon": 1.8538
+ },
+ {
+  "place": "Dunkirk",
+  "iso3": "FRA",
+  "lat": 51.0348,
+  "lon": 2.3773
+ },
+ {
+  "place": "Grande-Synthe",
+  "iso3": "FRA",
+  "lat": 51.0135,
+  "lon": 2.303
+ },
+ {
+  "place": "Bihac",
+  "iso3": "BIH",
+  "lat": 44.8147,
+  "lon": 15.869
+ },
+ {
+  "place": "Velika Kladusa",
+  "iso3": "BIH",
+  "lat": 45.1843,
+  "lon": 15.8069
+ },
+ {
+  "place": "Presevo",
+  "iso3": "SRB",
+  "lat": 42.3102,
+  "lon": 21.6474
+ },
+ {
+  "place": "Tuzla",
+  "iso3": "BIH",
+  "lat": 44.5393,
+  "lon": 18.6749
+ },
+ {
+  "place": "Agadez",
+  "iso3": "NER",
+  "lat": 16.9726,
+  "lon": 7.9907
+ },
+ {
+  "place": "Niamey",
+  "iso3": "NER",
+  "lat": 13.5248,
+  "lon": 2.1098
+ },
+ {
+  "place": "Zinder",
+  "iso3": "NER",
+  "lat": 13.8063,
+  "lon": 8.9892
+ },
+ {
+  "place": "Diffa",
+  "iso3": "NER",
+  "lat": 13.3131,
+  "lon": 12.6137
+ },
+ {
+  "place": "Maradi",
+  "iso3": "NER",
+  "lat": 13.5012,
+  "lon": 7.1025
+ },
+ {
+  "place": "Seguedine",
+  "iso3": "NER",
+  "lat": 20.1962,
+  "lon": 12.9666
+ },
+ {
+  "place": "Dirkou",
+  "iso3": "NER",
+  "lat": 19.0025,
+  "lon": 12.8937
+ },
+ {
+  "place": "Gao",
+  "iso3": "MLI",
+  "lat": 16.2788,
+  "lon": -0.0412
+ },
+ {
+  "place": "Timbuktu",
+  "iso3": "MLI",
+  "lat": 16.7719,
+  "lon": -3.0087
+ },
+ {
+  "place": "Mopti",
+  "iso3": "MLI",
+  "lat": 14.5145,
+  "lon": -3.6465
+ },
+ {
+  "place": "Bamako",
+  "iso3": "MLI",
+  "lat": 12.6493,
+  "lon": -8.0003
+ },
+ {
+  "place": "Kayes",
+  "iso3": "MLI",
+  "lat": 13.8002,
+  "lon": -10.2246
+ },
+ {
+  "place": "Tamanrasset",
+  "iso3": "DZA",
+  "lat": 24.3753,
+  "lon": 4.3208
+ },
+ {
+  "place": "Ouargla",
+  "iso3": "DZA",
+  "lat": 30.5532,
+  "lon": 6.7271
+ },
+ {
+  "place": "Algiers",
+  "iso3": "DZA",
+  "lat": 36.7729,
+  "lon": 3.0588
+ },
+ {
+  "place": "Nouadhibou",
+  "iso3": "MRT",
+  "lat": 20.9127,
+  "lon": -17.0503
+ },
+ {
+  "place": "Nouakchott",
+  "iso3": "MRT",
+  "lat": 18.0792,
+  "lon": -15.978
+ },
+ {
+  "place": "Dakar",
+  "iso3": "SEN",
+  "lat": 14.6934,
+  "lon": -17.4479
+ },
+ {
+  "place": "Saint-Louis",
+  "iso3": "SEN",
+  "lat": 16.028,
+  "lon": -16.5049
+ },
+ {
+  "place": "Tripoli",
+  "iso3": "LBY",
+  "lat": 32.8967,
+  "lon": 13.1778
+ },
+ {
+  "place": "Misrata",
+  "iso3": "LBY",
+  "lat": 32.3746,
+  "lon": 15.0906
+ },
+ {
+  "place": "Benghazi",
+  "iso3": "LBY",
+  "lat": 32.12,
+  "lon": 20.0812
+ },
+ {
+  "place": "Sabratha",
+  "iso3": "LBY",
+  "lat": 32.7885,
+  "lon": 12.4913
+ },
+ {
+  "place": "Zawiya",
+  "iso3": "LBY",
+  "lat": 32.2515,
+  "lon": 22.6652
+ },
+ {
+  "place": "Sebha",
+  "iso3": "LBY",
+  "lat": 26.9956,
+  "lon": 15.1065
+ },
+ {
+  "place": "Ajdabiya",
+  "iso3": "LBY",
+  "lat": 30.755,
+  "lon": 20.2234
+ },
+ {
+  "place": "Tunis",
+  "iso3": "TUN",
+  "lat": 36.8002,
+  "lon": 10.1858
+ },
+ {
+  "place": "Sfax",
+  "iso3": "TUN",
+  "lat": 34.7394,
+  "lon": 10.7604
+ },
+ {
+  "place": "Zarzis",
+  "iso3": "TUN",
+  "lat": 33.5037,
+  "lon": 11.1097
+ },
+ {
+  "place": "Medenine",
+  "iso3": "TUN",
+  "lat": 32.982,
+  "lon": 11.287
+ },
+ {
+  "place": "Tataouine",
+  "iso3": "TUN",
+  "lat": 32.9315,
+  "lon": 10.4504
+ },
+ {
+  "place": "Djerba",
+  "iso3": "TUN",
+  "lat": 33.7736,
+  "lon": 10.8862
+ },
+ {
+  "place": "Tangier",
+  "iso3": "MAR",
+  "lat": 35.7696,
+  "lon": -5.8034
+ },
+ {
+  "place": "Nador",
+  "iso3": "MAR",
+  "lat": 35.174,
+  "lon": -2.9281
+ },
+ {
+  "place": "Casablanca",
+  "iso3": "MAR",
+  "lat": 33.5945,
+  "lon": -7.62
+ },
+ {
+  "place": "Oujda",
+  "iso3": "MAR",
+  "lat": 34.6779,
+  "lon": -1.9293
+ },
+ {
+  "place": "Laayoune",
+  "iso3": "MAR",
+  "lat": 27.1545,
+  "lon": -13.1954
+ },
+ {
+  "place": "Dakhla",
+  "iso3": "MAR",
+  "lat": 23.6941,
+  "lon": -15.9431
+ },
+ {
+  "place": "Guelmim",
+  "iso3": "MAR",
+  "lat": 28.9864,
+  "lon": -10.0574
+ },
+ {
+  "place": "Alexandria",
+  "iso3": "EGY",
+  "lat": 31.1992,
+  "lon": 29.8952
+ },
+ {
+  "place": "Cairo",
+  "iso3": "EGY",
+  "lat": 30.0444,
+  "lon": 31.2357
+ },
+ {
+  "place": "Gaza Strip",
+  "iso3": "PSE",
+  "lat": 31.5129,
+  "lon": 34.4581
+ },
+ {
+  "place": "Gaza City",
+  "iso3": "PSE",
+  "lat": 31.505,
+  "lon": 34.4641
+ },
+ {
+  "place": "Rafah",
+  "iso3": "PSE",
+  "lat": 31.2981,
+  "lon": 34.26
+ },
+ {
+  "place": "Khan Younis",
+  "iso3": "PSE",
+  "lat": 31.3439,
+  "lon": 34.3028
+ },
+ {
+  "place": "Jabalia",
+  "iso3": "PSE",
+  "lat": 31.5282,
+  "lon": 34.4832
+ },
+ {
+  "place": "Deir al-Balah",
+  "iso3": "PSE",
+  "lat": 31.4085,
+  "lon": 34.3593
+ },
+ {
+  "place": "Nuseirat",
+  "iso3": "PSE",
+  "lat": 31.4483,
+  "lon": 34.3935
+ },
+ {
+  "place": "Beit Lahia",
+  "iso3": "PSE",
+  "lat": 31.554,
+  "lon": 34.508
+ },
+ {
+  "place": "Damascus",
+  "iso3": "SYR",
+  "lat": 33.5131,
+  "lon": 36.3096
+ },
+ {
+  "place": "Aleppo",
+  "iso3": "SYR",
+  "lat": 36.1992,
+  "lon": 37.1637
+ },
+ {
+  "place": "Idlib",
+  "iso3": "SYR",
+  "lat": 35.9302,
+  "lon": 36.6353
+ },
+ {
+  "place": "Raqqa",
+  "iso3": "SYR",
+  "lat": 35.9497,
+  "lon": 39.0089
+ },
+ {
+  "place": "Homs",
+  "iso3": "SYR",
+  "lat": 34.7333,
+  "lon": 36.7167
+ },
+ {
+  "place": "Hama",
+  "iso3": "SYR",
+  "lat": 35.1343,
+  "lon": 36.7496
+ },
+ {
+  "place": "Daraa",
+  "iso3": "SYR",
+  "lat": 32.6228,
+  "lon": 36.1068
+ },
+ {
+  "place": "Deir ez-Zor",
+  "iso3": "SYR",
+  "lat": 35.3333,
+  "lon": 40.15
+ },
+ {
+  "place": "Al-Hasakah",
+  "iso3": "SYR",
+  "lat": 36.4132,
+  "lon": 40.5269
+ },
+ {
+  "place": "Afrin",
+  "iso3": "SYR",
+  "lat": 36.5084,
+  "lon": 36.8701
+ },
+ {
+  "place": "Azaz",
+  "iso3": "SYR",
+  "lat": 36.5864,
+  "lon": 37.0464
+ },
+ {
+  "place": "Kobane",
+  "iso3": "SYR",
+  "lat": 36.89,
+  "lon": 38.3542
+ },
+ {
+  "place": "Beirut",
+  "iso3": "LBN",
+  "lat": 33.8959,
+  "lon": 35.4784
+ },
+ {
+  "place": "Tripoli",
+  "iso3": "LBN",
+  "lat": 34.4374,
+  "lon": 35.8349
+ },
+ {
+  "place": "Sidon",
+  "iso3": "LBN",
+  "lat": 33.5647,
+  "lon": 35.375
+ },
+ {
+  "place": "Tyre",
+  "iso3": "LBN",
+  "lat": 33.2721,
+  "lon": 35.1964
+ },
+ {
+  "place": "Baalbek",
+  "iso3": "LBN",
+  "lat": 34.0097,
+  "lon": 36.2117
+ },
+ {
+  "place": "Bekaa Valley",
+  "iso3": "LBN",
+  "lat": 33.85,
+  "lon": 36.0
+ },
+ {
+  "place": "Amman",
+  "iso3": "JOR",
+  "lat": 31.9516,
+  "lon": 35.924
+ },
+ {
+  "place": "Zaatari",
+  "iso3": "JOR",
+  "lat": 32.2942,
+  "lon": 36.3267
+ },
+ {
+  "place": "Azraq",
+  "iso3": "JOR",
+  "lat": 31.8833,
+  "lon": 36.8167
+ },
+ {
+  "place": "Irbid",
+  "iso3": "JOR",
+  "lat": 32.5556,
+  "lon": 35.8493
+ },
+ {
+  "place": "Baghdad",
+  "iso3": "IRQ",
+  "lat": 33.3062,
+  "lon": 44.3872
+ },
+ {
+  "place": "Erbil",
+  "iso3": "IRQ",
+  "lat": 36.1912,
+  "lon": 44.0094
+ },
+ {
+  "place": "Mosul",
+  "iso3": "IRQ",
+  "lat": 36.3416,
+  "lon": 43.1291
+ },
+ {
+  "place": "Dohuk",
+  "iso3": "IRQ",
+  "lat": 36.8543,
+  "lon": 42.9925
+ },
+ {
+  "place": "Sulaymaniyah",
+  "iso3": "IRQ",
+  "lat": 35.5571,
+  "lon": 45.4426
+ },
+ {
+  "place": "Istanbul",
+  "iso3": "TUR",
+  "lat": 41.0064,
+  "lon": 28.9759
+ },
+ {
+  "place": "Ankara",
+  "iso3": "TUR",
+  "lat": 39.9208,
+  "lon": 32.854
+ },
+ {
+  "place": "Izmir",
+  "iso3": "TUR",
+  "lat": 38.4193,
+  "lon": 27.1285
+ },
+ {
+  "place": "Hatay",
+  "iso3": "TUR",
+  "lat": 36.2025,
+  "lon": 36.1603
+ },
+ {
+  "place": "Gaziantep",
+  "iso3": "TUR",
+  "lat": 37.0628,
+  "lon": 37.3793
+ },
+ {
+  "place": "Sanliurfa",
+  "iso3": "TUR",
+  "lat": 37.2595,
+  "lon": 39.0408
+ },
+ {
+  "place": "Kilis",
+  "iso3": "TUR",
+  "lat": 36.7797,
+  "lon": 37.1417
+ },
+ {
+  "place": "Edirne",
+  "iso3": "TUR",
+  "lat": 41.6759,
+  "lon": 26.5587
+ },
+ {
+  "place": "Tehran",
+  "iso3": "IRN",
+  "lat": 35.6893,
+  "lon": 51.3896
+ },
+ {
+  "place": "Mashhad",
+  "iso3": "IRN",
+  "lat": 36.2975,
+  "lon": 59.6059
+ },
+ {
+  "place": "Zahedan",
+  "iso3": "IRN",
+  "lat": 29.4907,
+  "lon": 60.8635
+ },
+ {
+  "place": "Kerman",
+  "iso3": "IRN",
+  "lat": 29.5719,
+  "lon": 57.301
+ },
+ {
+  "place": "Tabriz",
+  "iso3": "IRN",
+  "lat": 38.0739,
+  "lon": 46.2979
+ },
+ {
+  "place": "Urmia",
+  "iso3": "IRN",
+  "lat": 37.5483,
+  "lon": 45.0667
+ },
+ {
+  "place": "Qom",
+  "iso3": "IRN",
+  "lat": 34.6423,
+  "lon": 50.8801
+ },
+ {
+  "place": "Khartoum",
+  "iso3": "SDN",
+  "lat": 15.5636,
+  "lon": 32.5349
+ },
+ {
+  "place": "Omdurman",
+  "iso3": "SDN",
+  "lat": 15.6446,
+  "lon": 32.4777
+ },
+ {
+  "place": "El Fasher",
+  "iso3": "SDN",
+  "lat": 13.6238,
+  "lon": 25.3556
+ },
+ {
+  "place": "Nyala",
+  "iso3": "SDN",
+  "lat": 12.0505,
+  "lon": 24.8795
+ },
+ {
+  "place": "El Geneina",
+  "iso3": "SDN",
+  "lat": 13.442,
+  "lon": 22.446
+ },
+ {
+  "place": "Zalingei",
+  "iso3": "SDN",
+  "lat": 13.0661,
+  "lon": 23.6838
+ },
+ {
+  "place": "Kassala",
+  "iso3": "SDN",
+  "lat": 15.4322,
+  "lon": 36.4167
+ },
+ {
+  "place": "Port Sudan",
+  "iso3": "SDN",
+  "lat": 19.5201,
+  "lon": 37.2489
+ },
+ {
+  "place": "Wad Madani",
+  "iso3": "SDN",
+  "lat": 14.3966,
+  "lon": 33.531
+ },
+ {
+  "place": "El Obeid",
+  "iso3": "SDN",
+  "lat": 13.1834,
+  "lon": 30.2226
+ },
+ {
+  "place": "Darfur",
+  "iso3": "SDN",
+  "lat": 11.0,
+  "lon": 25.0
+ },
+ {
+  "place": "Kordofan",
+  "iso3": "SDN",
+  "lat": 13.0851,
+  "lon": 30.3547
+ },
+ {
+  "place": "Mogadishu",
+  "iso3": "SOM",
+  "lat": 2.0349,
+  "lon": 45.3419
+ },
+ {
+  "place": "Hargeisa",
+  "iso3": "SOM",
+  "lat": 9.5617,
+  "lon": 44.0618
+ },
+ {
+  "place": "Baidoa",
+  "iso3": "SOM",
+  "lat": 3.155,
+  "lon": 43.584
+ },
+ {
+  "place": "Kismayo",
+  "iso3": "SOM",
+  "lat": -0.3602,
+  "lon": 42.5409
+ },
+ {
+  "place": "Bosaso",
+  "iso3": "SOM",
+  "lat": 11.2785,
+  "lon": 49.18
+ },
+ {
+  "place": "Garowe",
+  "iso3": "SOM",
+  "lat": 8.4061,
+  "lon": 48.4832
+ },
+ {
+  "place": "Dollow",
+  "iso3": "SOM",
+  "lat": 4.1636,
+  "lon": 42.0764
+ },
+ {
+  "place": "Addis Ababa",
+  "iso3": "ETH",
+  "lat": 9.0358,
+  "lon": 38.7524
+ },
+ {
+  "place": "Mekelle",
+  "iso3": "ETH",
+  "lat": 13.496,
+  "lon": 39.4095
+ },
+ {
+  "place": "Gondar",
+  "iso3": "ETH",
+  "lat": 12.6104,
+  "lon": 37.4668
+ },
+ {
+  "place": "Bahir Dar",
+  "iso3": "ETH",
+  "lat": 11.5914,
+  "lon": 37.39
+ },
+ {
+  "place": "Dire Dawa",
+  "iso3": "ETH",
+  "lat": 9.6266,
+  "lon": 41.803
+ },
+ {
+  "place": "Semera",
+  "iso3": "ETH",
+  "lat": 11.7923,
+  "lon": 41.0089
+ },
+ {
+  "place": "Tigray",
+  "iso3": "ETH",
+  "lat": 13.8813,
+  "lon": 39.1275
+ },
+ {
+  "place": "Juba",
+  "iso3": "SSD",
+  "lat": 4.8459,
+  "lon": 31.5959
+ },
+ {
+  "place": "Yei",
+  "iso3": "SSD",
+  "lat": 4.2432,
+  "lon": 30.2846
+ },
+ {
+  "place": "Rumbek",
+  "iso3": "SSD",
+  "lat": 6.8064,
+  "lon": 29.6767
+ },
+ {
+  "place": "Wau",
+  "iso3": "SSD",
+  "lat": 7.7001,
+  "lon": 27.9909
+ },
+ {
+  "place": "Malakal",
+  "iso3": "SSD",
+  "lat": 9.5388,
+  "lon": 31.6584
+ },
+ {
+  "place": "Bentiu",
+  "iso3": "SSD",
+  "lat": 9.2481,
+  "lon": 29.7977
+ },
+ {
+  "place": "Bor",
+  "iso3": "SSD",
+  "lat": 6.2109,
+  "lon": 31.5614
+ },
+ {
+  "place": "Aweil",
+  "iso3": "SSD",
+  "lat": 8.7693,
+  "lon": 27.3962
+ },
+ {
+  "place": "Abyei",
+  "iso3": "SSD",
+  "lat": 9.5975,
+  "lon": 28.4406
+ },
+ {
+  "place": "Nairobi",
+  "iso3": "KEN",
+  "lat": -1.289,
+  "lon": 36.8173
+ },
+ {
+  "place": "Dadaab",
+  "iso3": "KEN",
+  "lat": 0.0526,
+  "lon": 40.3076
+ },
+ {
+  "place": "Kakuma",
+  "iso3": "KEN",
+  "lat": 3.7063,
+  "lon": 34.8735
+ },
+ {
+  "place": "Mombasa",
+  "iso3": "KEN",
+  "lat": -4.0505,
+  "lon": 39.6672
+ },
+ {
+  "place": "Kampala",
+  "iso3": "UGA",
+  "lat": 0.3177,
+  "lon": 32.5814
+ },
+ {
+  "place": "Bidi Bidi",
+  "iso3": "UGA",
+  "lat": 3.2957,
+  "lon": 31.1988
+ },
+ {
+  "place": "Djibouti",
+  "iso3": "DJI",
+  "lat": 11.8146,
+  "lon": 42.8453
+ },
+ {
+  "place": "Obock",
+  "iso3": "DJI",
+  "lat": 11.964,
+  "lon": 43.2922
+ },
+ {
+  "place": "Asmara",
+  "iso3": "ERI",
+  "lat": 15.339,
+  "lon": 38.9327
+ },
+ {
+  "place": "Massawa",
+  "iso3": "ERI",
+  "lat": 15.6032,
+  "lon": 39.4637
+ },
+ {
+  "place": "Goma",
+  "iso3": "COD",
+  "lat": -1.6666,
+  "lon": 29.2257
+ },
+ {
+  "place": "Bukavu",
+  "iso3": "COD",
+  "lat": -2.5056,
+  "lon": 28.8595
+ },
+ {
+  "place": "Beni",
+  "iso3": "COD",
+  "lat": 0.3974,
+  "lon": 29.2117
+ },
+ {
+  "place": "Butembo",
+  "iso3": "COD",
+  "lat": 0.125,
+  "lon": 29.292
+ },
+ {
+  "place": "Bunia",
+  "iso3": "COD",
+  "lat": 1.5621,
+  "lon": 30.2479
+ },
+ {
+  "place": "Kisangani",
+  "iso3": "COD",
+  "lat": 0.5184,
+  "lon": 25.2057
+ },
+ {
+  "place": "Kalemie",
+  "iso3": "COD",
+  "lat": -5.946,
+  "lon": 29.1967
+ },
+ {
+  "place": "Rutshuru",
+  "iso3": "COD",
+  "lat": -1.1869,
+  "lon": 29.4461
+ },
+ {
+  "place": "Masisi",
+  "iso3": "COD",
+  "lat": -1.3972,
+  "lon": 28.8171
+ },
+ {
+  "place": "Uvira",
+  "iso3": "COD",
+  "lat": -3.4056,
+  "lon": 29.1376
+ },
+ {
+  "place": "Minova",
+  "iso3": "COD",
+  "lat": -1.7078,
+  "lon": 29.0243
+ },
+ {
+  "place": "Sake",
+  "iso3": "COD",
+  "lat": -1.5713,
+  "lon": 29.0536
+ },
+ {
+  "place": "Djugu",
+  "iso3": "COD",
+  "lat": 1.8969,
+  "lon": 30.3698
+ },
+ {
+  "place": "Kigali",
+  "iso3": "RWA",
+  "lat": -1.9534,
+  "lon": 30.114
+ },
+ {
+  "place": "Gisenyi",
+  "iso3": "RWA",
+  "lat": -1.6935,
+  "lon": 29.2599
+ },
+ {
+  "place": "Bujumbura",
+  "iso3": "BDI",
+  "lat": -3.3638,
+  "lon": 29.3675
+ },
+ {
+  "place": "Nyarugusu",
+  "iso3": "TZA",
+  "lat": -4.2285,
+  "lon": 30.3883
+ },
+ {
+  "place": "Nduta",
+  "iso3": "TZA",
+  "lat": -3.32,
+  "lon": 30.7
+ },
+ {
+  "place": "Bangui",
+  "iso3": "CAF",
+  "lat": 4.3635,
+  "lon": 18.5836
+ },
+ {
+  "place": "Bambari",
+  "iso3": "CAF",
+  "lat": 5.768,
+  "lon": 20.6756
+ },
+ {
+  "place": "Kaga-Bandoro",
+  "iso3": "CAF",
+  "lat": 6.9993,
+  "lon": 19.1823
+ },
+ {
+  "place": "Bossangoa",
+  "iso3": "CAF",
+  "lat": 6.4924,
+  "lon": 17.4463
+ },
+ {
+  "place": "Batangafo",
+  "iso3": "CAF",
+  "lat": 7.304,
+  "lon": 18.2911
+ },
+ {
+  "place": "Bouar",
+  "iso3": "CAF",
+  "lat": 5.9354,
+  "lon": 15.5922
+ },
+ {
+  "place": "N'Djamena",
+  "iso3": "TCD",
+  "lat": 8.2128,
+  "lon": 17.2544
+ },
+ {
+  "place": "Adre",
+  "iso3": "TCD",
+  "lat": 13.4665,
+  "lon": 22.1977
+ },
+ {
+  "place": "Abeche",
+  "iso3": "TCD",
+  "lat": 13.828,
+  "lon": 20.8284
+ },
+ {
+  "place": "Guereda",
+  "iso3": "TCD",
+  "lat": 14.5106,
+  "lon": 22.0884
+ },
+ {
+  "place": "Maiduguri",
+  "iso3": "NGA",
+  "lat": 11.8395,
+  "lon": 13.1536
+ },
+ {
+  "place": "Monguno",
+  "iso3": "NGA",
+  "lat": 12.6713,
+  "lon": 13.6167
+ },
+ {
+  "place": "Banki",
+  "iso3": "NGA",
+  "lat": 11.2514,
+  "lon": 14.1482
+ },
+ {
+  "place": "Baga",
+  "iso3": "NGA",
+  "lat": 13.0964,
+  "lon": 13.8216
+ },
+ {
+  "place": "Maroua",
+  "iso3": "CMR",
+  "lat": 10.6033,
+  "lon": 14.3282
+ },
+ {
+  "place": "Kousseri",
+  "iso3": "CMR",
+  "lat": 12.0831,
+  "lon": 15.0191
+ },
+ {
+  "place": "Minawao",
+  "iso3": "CMR",
+  "lat": 10.5525,
+  "lon": 13.864
+ },
+ {
+  "place": "Aden",
+  "iso3": "YEM",
+  "lat": 12.8333,
+  "lon": 44.9167
+ },
+ {
+  "place": "Sanaa",
+  "iso3": "YEM",
+  "lat": 15.2607,
+  "lon": 44.4249
+ },
+ {
+  "place": "Al Hudaydah",
+  "iso3": "YEM",
+  "lat": 15.1159,
+  "lon": 42.8448
+ },
+ {
+  "place": "Taiz",
+  "iso3": "YEM",
+  "lat": 13.5752,
+  "lon": 44.0215
+ },
+ {
+  "place": "Marib",
+  "iso3": "YEM",
+  "lat": 15.4579,
+  "lon": 45.323
+ },
+ {
+  "place": "Hajjah",
+  "iso3": "YEM",
+  "lat": 16.0,
+  "lon": 43.25
+ },
+ {
+  "place": "Abs",
+  "iso3": "YEM",
+  "lat": 16.0191,
+  "lon": 43.0485
+ },
+ {
+  "place": "Haradh",
+  "iso3": "YEM",
+  "lat": 16.4061,
+  "lon": 43.0561
+ },
+ {
+  "place": "Jeddah",
+  "iso3": "SAU",
+  "lat": 21.5504,
+  "lon": 39.1742
+ },
+ {
+  "place": "Riyadh",
+  "iso3": "SAU",
+  "lat": 24.6389,
+  "lon": 46.716
+ },
+ {
+  "place": "Muscat",
+  "iso3": "OMN",
+  "lat": 23.6124,
+  "lon": 58.5938
+ },
+ {
+  "place": "Sohar",
+  "iso3": "OMN",
+  "lat": 24.342,
+  "lon": 56.7298
+ },
+ {
+  "place": "Dubai",
+  "iso3": "ARE",
+  "lat": 25.2647,
+  "lon": 55.2924
+ },
+ {
+  "place": "Necoclí",
+  "iso3": "COL",
+  "lat": 8.4243,
+  "lon": -76.784
+ },
+ {
+  "place": "Turbo",
+  "iso3": "COL",
+  "lat": 8.0953,
+  "lon": -76.729
+ },
+ {
+  "place": "Capurganá",
+  "iso3": "COL",
+  "lat": 8.6366,
+  "lon": -77.3472
+ },
+ {
+  "place": "Lajas Blancas",
+  "iso3": "PAN",
+  "lat": 8.4154,
+  "lon": -77.8099
+ },
+ {
+  "place": "Bajo Chiquito",
+  "iso3": "PAN",
+  "lat": 8.4573,
+  "lon": -77.6788
+ },
+ {
+  "place": "Puerto Obaldia",
+  "iso3": "PAN",
+  "lat": 8.6671,
+  "lon": -77.4196
+ },
+ {
+  "place": "Yaviza",
+  "iso3": "PAN",
+  "lat": 8.1567,
+  "lon": -77.692
+ },
+ {
+  "place": "Tapachula",
+  "iso3": "MEX",
+  "lat": 14.9258,
+  "lon": -92.3222
+ },
+ {
+  "place": "Suchiate",
+  "iso3": "MEX",
+  "lat": 14.6322,
+  "lon": -92.242
+ },
+ {
+  "place": "Ciudad Hidalgo",
+  "iso3": "MEX",
+  "lat": 14.6797,
+  "lon": -92.1524
+ },
+ {
+  "place": "Palenque",
+  "iso3": "MEX",
+  "lat": 17.4532,
+  "lon": -91.8121
+ },
+ {
+  "place": "Tenosique",
+  "iso3": "MEX",
+  "lat": 17.4595,
+  "lon": -91.3134
+ },
+ {
+  "place": "Villahermosa",
+  "iso3": "MEX",
+  "lat": 17.9885,
+  "lon": -92.9366
+ },
+ {
+  "place": "Reynosa",
+  "iso3": "MEX",
+  "lat": 26.0928,
+  "lon": -98.2779
+ },
+ {
+  "place": "Matamoros",
+  "iso3": "MEX",
+  "lat": 25.881,
+  "lon": -97.5065
+ },
+ {
+  "place": "Nuevo Laredo",
+  "iso3": "MEX",
+  "lat": 27.4793,
+  "lon": -99.5221
+ },
+ {
+  "place": "Piedras Negras",
+  "iso3": "MEX",
+  "lat": 28.6913,
+  "lon": -100.5403
+ },
+ {
+  "place": "Ciudad Juarez",
+  "iso3": "MEX",
+  "lat": 31.6908,
+  "lon": -106.4253
+ },
+ {
+  "place": "Tijuana",
+  "iso3": "MEX",
+  "lat": 32.5317,
+  "lon": -117.0195
+ },
+ {
+  "place": "Mexicali",
+  "iso3": "MEX",
+  "lat": 32.6245,
+  "lon": -115.4526
+ },
+ {
+  "place": "Veracruz",
+  "iso3": "MEX",
+  "lat": 19.3333,
+  "lon": -96.6667
+ },
+ {
+  "place": "Coatzacoalcos",
+  "iso3": "MEX",
+  "lat": 18.1405,
+  "lon": -94.4344
+ },
+ {
+  "place": "San Pedro Sula",
+  "iso3": "HND",
+  "lat": 15.5054,
+  "lon": -88.0251
+ },
+ {
+  "place": "El Progreso",
+  "iso3": "HND",
+  "lat": 15.4009,
+  "lon": -87.812
+ },
+ {
+  "place": "Danli",
+  "iso3": "HND",
+  "lat": 14.0325,
+  "lon": -86.5683
+ },
+ {
+  "place": "Choluteca",
+  "iso3": "HND",
+  "lat": 13.3061,
+  "lon": -87.1956
+ },
+ {
+  "place": "Corinto",
+  "iso3": "HND",
+  "lat": 13.4374,
+  "lon": -87.4782
+ },
+ {
+  "place": "Tecún Umán",
+  "iso3": "GTM",
+  "lat": 14.6979,
+  "lon": -92.1333
+ },
+ {
+  "place": "La Mesilla",
+  "iso3": "GTM",
+  "lat": 15.6406,
+  "lon": -91.9808
+ },
+ {
+  "place": "El Ceibo",
+  "iso3": "GTM",
+  "lat": 17.2587,
+  "lon": -90.9829
+ },
+ {
+  "place": "Flores",
+  "iso3": "GTM",
+  "lat": 16.9299,
+  "lon": -89.8915
+ },
+ {
+  "place": "San Salvador",
+  "iso3": "SLV",
+  "lat": 13.6976,
+  "lon": -89.1912
+ },
+ {
+  "place": "Paso Canoas",
+  "iso3": "CRI",
+  "lat": 8.5351,
+  "lon": -82.8434
+ },
+ {
+  "place": "Sixaola",
+  "iso3": "CRI",
+  "lat": 9.5054,
+  "lon": -82.6146
+ },
+ {
+  "place": "Los Chiles",
+  "iso3": "CRI",
+  "lat": 10.857,
+  "lon": -84.715
+ },
+ {
+  "place": "San Jose",
+  "iso3": "CRI",
+  "lat": 9.9328,
+  "lon": -84.0796
+ },
+ {
+  "place": "Peñas Blancas",
+  "iso3": "CRI",
+  "lat": 10.3629,
+  "lon": -84.7
+ },
+ {
+  "place": "Cucuta",
+  "iso3": "COL",
+  "lat": 8.5158,
+  "lon": -73.3449
+ },
+ {
+  "place": "Arauca",
+  "iso3": "COL",
+  "lat": 6.6667,
+  "lon": -71.0
+ },
+ {
+  "place": "Maicao",
+  "iso3": "COL",
+  "lat": 11.3773,
+  "lon": -72.2388
+ },
+ {
+  "place": "Paraguachon",
+  "iso3": "COL",
+  "lat": 11.3616,
+  "lon": -72.1366
+ },
+ {
+  "place": "Caracas",
+  "iso3": "VEN",
+  "lat": 10.5061,
+  "lon": -66.9146
+ },
+ {
+  "place": "Maracaibo",
+  "iso3": "VEN",
+  "lat": 10.6498,
+  "lon": -71.6444
+ },
+ {
+  "place": "Catia La Mar",
+  "iso3": "VEN",
+  "lat": 10.5993,
+  "lon": -67.0145
+ },
+ {
+  "place": "Darien",
+  "iso3": "PAN",
+  "lat": 8.2159,
+  "lon": -78.0173
+ },
+ {
+  "place": "Cox's Bazar",
+  "iso3": "BGD",
+  "lat": 21.442,
+  "lon": 91.9812
+ },
+ {
+  "place": "Kutupalong",
+  "iso3": "BGD",
+  "lat": 21.2125,
+  "lon": 92.1643
+ },
+ {
+  "place": "Ukhia",
+  "iso3": "BGD",
+  "lat": 21.2421,
+  "lon": 92.1399
+ },
+ {
+  "place": "Teknaf",
+  "iso3": "BGD",
+  "lat": 20.8685,
+  "lon": 92.2987
+ },
+ {
+  "place": "Sittwe",
+  "iso3": "MMR",
+  "lat": 20.5659,
+  "lon": 92.9079
+ },
+ {
+  "place": "Maungdaw",
+  "iso3": "MMR",
+  "lat": 20.8269,
+  "lon": 92.3661
+ },
+ {
+  "place": "Buthidaung",
+  "iso3": "MMR",
+  "lat": 20.9896,
+  "lon": 92.5413
+ },
+ {
+  "place": "Rakhine",
+  "iso3": "MMR",
+  "lat": 19.5317,
+  "lon": 93.9967
+ },
+ {
+  "place": "Kabul",
+  "iso3": "AFG",
+  "lat": 34.527,
+  "lon": 69.1851
+ },
+ {
+  "place": "Herat",
+  "iso3": "AFG",
+  "lat": 34.3491,
+  "lon": 62.2163
+ },
+ {
+  "place": "Kandahar",
+  "iso3": "AFG",
+  "lat": 31.5073,
+  "lon": 65.7149
+ },
+ {
+  "place": "Jalalabad",
+  "iso3": "AFG",
+  "lat": 34.4302,
+  "lon": 70.4601
+ },
+ {
+  "place": "Mazar-i-Sharif",
+  "iso3": "AFG",
+  "lat": 36.709,
+  "lon": 67.1114
+ },
+ {
+  "place": "Kunduz",
+  "iso3": "AFG",
+  "lat": 36.7176,
+  "lon": 68.8673
+ },
+ {
+  "place": "Zaranj",
+  "iso3": "AFG",
+  "lat": 30.9318,
+  "lon": 62.0021
+ },
+ {
+  "place": "Nimroz",
+  "iso3": "AFG",
+  "lat": 30.7754,
+  "lon": 62.4793
+ },
+ {
+  "place": "Lashkar Gah",
+  "iso3": "AFG",
+  "lat": 31.5831,
+  "lon": 64.3601
+ },
+ {
+  "place": "Panjshir",
+  "iso3": "AFG",
+  "lat": 35.4339,
+  "lon": 69.7931
+ },
+ {
+  "place": "Peshawar",
+  "iso3": "PAK",
+  "lat": 34.0124,
+  "lon": 71.5787
+ },
+ {
+  "place": "Quetta",
+  "iso3": "PAK",
+  "lat": 30.1958,
+  "lon": 67.0172
+ },
+ {
+  "place": "Karachi",
+  "iso3": "PAK",
+  "lat": 24.8547,
+  "lon": 67.0207
+ },
+ {
+  "place": "Torkham",
+  "iso3": "PAK",
+  "lat": 34.1207,
+  "lon": 71.1016
+ },
+ {
+  "place": "Chaman",
+  "iso3": "PAK",
+  "lat": 24.935,
+  "lon": 67.1407
+ },
+ {
+  "place": "Islamabad",
+  "iso3": "PAK",
+  "lat": 31.8817,
+  "lon": 73.8587
+ },
+ {
+  "place": "Khyber Pass",
+  "iso3": "PAK",
+  "lat": 34.085,
+  "lon": 71.144
+ },
+ {
+  "place": "Srinagar",
+  "iso3": "IND",
+  "lat": 34.0747,
+  "lon": 74.8204
+ },
+ {
+  "place": "Kupwara",
+  "iso3": "IND",
+  "lat": 34.5141,
+  "lon": 74.1914
+ },
+ {
+  "place": "Colombo",
+  "iso3": "LKA",
+  "lat": 6.9389,
+  "lon": 79.8542
+ }
+]

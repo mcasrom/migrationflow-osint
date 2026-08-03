@@ -107,8 +107,12 @@ Priorizada (P1 = mayor valor/esfuerzo).
 - [x] **Modo tendencia**: color por % de cambio respecto al año anterior (▲▼, rojo/verde). Ya existe el
       filtro `year` (ahora también en el summary); falta la comparativa en el choropleth o una vista delta.
 - [x] **Panel de gráficos**: pestaña con serie mensual de incidentes y top países afectados.
-- [ ] **Geocoding fino para news**: localizar subregiones/ciudades (hoy centroide de país).
-- [ ] **Ampliar dataset de bulos** a más claims (hoy 6 curados) y añadir verificación por URL/claim compartido.
+- [x] **Geocoding fino para news**: gazetteer local de 296 hotspots migratorios (datos
+      `data/gazetteer.json`, coords validadas con Photon) + fallback a Photon (OSM) restringido al
+      país del artículo con cache en `data/geocache.json`; si nada es fiable, centroide del país.
+- [x] **Dataset de bulos ampliado** (6→14, curados con fuentes verificadoras) y **verificación por
+      URL/claim compartido**: `/api/verify` acepta `url` (descarga segura anti-SSRF y extrae el
+      claim) y el frontend responde a `?claim=` para compartir verificaciones.
 - [x] **Capa Frontex con tendencia**: serie mensual de **entradas por país de origen** (tabla
       `arrivals_series`, fuente: campos `fYYYY_MM` de `DetectionsOfIBCs` capa 1, actualizados). El dato
       mensual **por ruta** no está disponible en ArcGIS (solo mes actual, ya en `arrivals_route`), por lo
@@ -121,6 +125,9 @@ Serie mensual: `arrivals_series(country_iso3, month, value)` poblada por `fronte
 por ruta en ArcGIS. Endpoints: `/api/arrivals/series`, `/api/trends` (YTD vs. mismo periodo previo),
 `/api/charts`. Frontend: toggle *Tendencia* sobre choropleth (rojo/verde ▲▼) y pestaña *Gráficos*
 (SVG propio, sin librerías). Verificado con CDP.
+Geocoding fino: `src/geocode.py` (gazetteer + Photon + cache, datos `data/gazetteer.json`,
+`data/iso2.json` generados una vez con Photon/pycountry). Bulos: `src/bulos.py` (14 curados),
+`/api/verify` acepta `q` o `url` (descarga con guardia anti-SSRF).
 
 ### Sprint posterior — P2 (experiencia, anotado)
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).

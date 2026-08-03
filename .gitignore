@@ -7,5 +7,7 @@ data/*.csv
 data/*.xlsx
 data/*.json
 !data/countries_geo.json
+!data/gazetteer.json
+!data/iso2.json
 *.db
 .DS_Store

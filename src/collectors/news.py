@@ -15,7 +15,8 @@ from src.config import (RELIEFWEB_RSS, NEWS_KEYWORDS, NEWS_MAX_ITEMS,
 from src.logging import get_logger
 from src.models import Event
 from src.collectors.base import BaseCollector
-from src.collectors.countries import match_country_by_name, match_country_iso3
+from src.collectors.countries import match_country_by_name
+from src.geocode import refine
 
 logger = get_logger("src.collectors.news")
 
@@ -58,6 +59,12 @@ class NewsCollector(BaseCollector):
             if not geo:
                 continue
 
+            fine = refine(geo.get("iso3", ""), geo["lat"], geo["lon"], title, description)
+            label = fine["name"] or geo["name"]
+            if fine["name"]:
+                logger.info("[news] geocoding fino: %s (%s) → %s,%s",
+                            fine["name"], geo.get("iso3"), fine["lat"], fine["lon"])
+
             pub = None
             try:
                 dt = parsedate_to_datetime(item.findtext("pubDate") or "")
@@ -71,12 +78,12 @@ class NewsCollector(BaseCollector):
                 source=self.source,
                 source_id=f"news:{guid[:80]}",
                 event_type="news",
-                lat=geo["lat"],
-                lon=geo["lon"],
+                lat=fine["lat"],
+                lon=fine["lon"],
                 level="info",
                 title=title or "Noticia humanitaria",
                 description=(description[:500] + ("…" if len(description) > 500 else "")) or "",
-                country=geo["name"],
+                country=label,
                 iso3=geo.get("iso3", ""),
                 category="news",
                 admin_level="incident",

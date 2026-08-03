@@ -33,6 +33,7 @@ _NAME_VARIANTS = {
     "cabo verde": "CPV", "cape verde": "CPV",
     "moldova": "MDA", "republic of moldova": "MDA",
     "palestine": "PSE", "state of palestine": "PSE",
+    "occupied palestinian territory": "PSE", "occupied palestinian territories": "PSE", "opt": "PSE",
     "eswatini": "SWZ", "swaziland": "SWZ",
     "north macedonia": "MKD", "macedonia": "MKD",
     "myanmar": "MMR", "burma": "MMR",

@@ -57,6 +57,7 @@ NEWS_KEYWORDS = [
     "idp", "border", "crossing", "deportation", "remigration", "diaspora",
 ]
 NEWS_MAX_ITEMS = 20
+PHOTON_API = "https://photon.komoot.io/api/"   # geocoder OSM (Nominatim) para geocoding fino
 
 # ── Event types (label en español para la UI) ────────────────
 EVENT_TYPES = {
