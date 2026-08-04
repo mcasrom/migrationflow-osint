@@ -639,7 +639,8 @@ function normName(n) { return String(n || "").toLowerCase().normalize("NFD").rep
 
 function isoOfFeature(f) {
   const p = f.properties || {};
-  const iso = p.ISO_A3 && p.ISO_A3 !== "-99" ? p.ISO_A3 : (p.ISO_N3 ? p.ISO_N3 : null);
+  let iso = (p.ISO_A3 && p.ISO_A3 !== "-99") ? p.ISO_A3 : null;
+  if (!iso && p.ISO_A3_EH && p.ISO_A3_EH !== "-99") iso = p.ISO_A3_EH;
   return iso;
 }
 
