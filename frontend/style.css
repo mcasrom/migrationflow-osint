@@ -116,6 +116,19 @@ header .sub { font-size: 11px; color: var(--muted); }
   box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
 body.is-offline { padding-top: 0; }
+
+.source-warn {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 3000;
+  background: #d97706;
+  color: #fff;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
 .about { font-size: 12px; line-height: 1.65; padding-left: 18px; color: var(--text); }
 .about li { margin-bottom: 6px; }
 .src-list { font-size: 12px; line-height: 1.55; }

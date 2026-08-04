@@ -1111,6 +1111,18 @@ function TYPE_LABEL(t) {
   return t;
 }
 
+function updateSourceWarn() {
+  const el = document.getElementById("sourceWarnBanner");
+  if (!el) return;
+  const bad = ((status && status.collectors) || []).filter(c => (c.consecutive_failures || 0) >= 2);
+  if (bad.length) {
+    el.textContent = "⚠️ " + bad.map(c => c.collector).join(", ") + " - " + t("sources_down");
+    el.classList.remove("hidden");
+  } else {
+    el.classList.add("hidden");
+  }
+}
+
 async function updateSources() {
   if (!status) return;
   const box = document.getElementById("sourcesBoxInfo");
@@ -1142,6 +1154,7 @@ async function loadAll() {
     }
     updateSummary();
     updateSources();
+    updateSourceWarn();
   } catch { onNetworkFail(); }
   await refreshEvents();
 }

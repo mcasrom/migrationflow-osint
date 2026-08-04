@@ -98,6 +98,7 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 - **News**: TTL de **14 días** (`SOURCE_TTL_DAYS`); son puntos de actualidad, no stock.
 - **Frescura stocks UNHCR/IDMC (ago 2026)**: los stocks (refugiados/asilo/IDP/desplazamiento) son **datos anuales** (snapshot 31/12). UNHCR_YEARS en src/config.py ahora es **dinamico** [año actual, año-1, año-2]; antes estaba fijo en [2024, 2023] y **todos los paises** mostraban ultimo dato 31/12/2024 aunque la API UNHCR ya publicaba 2025. Tras el fix se ingirio 2025 (RUS: refugiados 10077->11811, origen 96869->99360; affected 277946->282171). El DTM (IOM) es el unico stock casi en real (2026-05). Si un pais no aparece en 2025, es que la fuente no tiene cifra ese año (p. ej. RUS displacement sigue en 2024: IDMC no publica dato 2025 para RF).
 - **PWA / rendimiento (ago 2026)**: countries.geojson (838 KB) ya se sirve con **gzip** (application/geo+json en gzip_types de nginx -> 211 KB). Manifest con id, start_url / y **screenshots** (frontend/screenshots/{wide,mobile}.png, 1280x800 y 390x844) -> prompt enriquecido de instalacion. Metas iOS (apple-mobile-web-app-capable/status-bar/title). **Offline real**: sw v14 con cache-first + revalidacion en background para assets estables, banner offline (online/offline) y aviso de error de red en lugar de fallos silenciosos; /sw.js se sirve con Cache-Control no-store para propagar versiones al instante.
+- **Alerta de fuentes caidas (ago 2026)**: `fetch_status()` calcula `consecutive_failures` por colector
 - `deploy.sh` pasa `--host/--port` a `server.py`, pero `server.py` toma `SERVER_HOST/PORT` de `.env`
   (los argumentos se ignoran; inofensivo).
 
@@ -171,7 +172,9 @@ se verificaron contra código y render en vivo antes de planear.
 ### Sprint posterior — P3 (calidad y automatización, anotado)
 - [ ] Tests automatizados (unittest de `src.db`, `countries`, colectores con fixtures).
 - [ ] CI en GitHub Actions (lint + tests) para proteger `main`.
-- [ ] Alerta visible en el frontend si un colector falla 2+ corridas seguidas (hoy solo estado en "Fuentes").
+- [x] Alerta visible en el frontend si un colector falla 2+ corridas seguidas: banner naranja con los
+      nombres de los colectores afectados; `/api/status` expone `consecutive_failures` (SQL de bloques
+      consecutivos sobre `collector_runs`). Verificado con corridas fallidas simuladas.
 - [ ] Export GeoJSON de agregación por país (para descargar el choropleth).
 - [ ] Evitar doble conteo en el choropleth cuando el filtro de año es "todos" (hoy suma todos los snapshots
       del período por tipo por país; el popup ya no lo hace).
@@ -197,9 +200,10 @@ se verificaron contra código y render en vivo antes de planear.
 - **Sampling CPU headless**: no aplica.
 - El funnel de bienvenida se guarda en `localStorage` (`mf_intro_seen`) — al probar cambios, limpiar
   el sitio o usar ventana privada.
-- Service worker con **network-first para assets** (SW v12): tras un deploy basta recargar una vez; las
-  cachés viejas se purgan al activar. Las suscripciones push quedan inválidas si se regeneran las claves VAPID
-  (limpiar `push_subscriptions`).
+- Service worker **SW v14** con **cache-first + revalidación en background** para assets estables
+  (js/css/imágenes/geojson) y network-first para la página; `/sw.js` se sirve con `Cache-Control: no-store`
+  para propagar versiones al instante. Tras un deploy basta recargar una vez; las cachés viejas se purgan al
+  activar. Las suscripciones push quedan inválidas si se regeneran las claves VAPID (limpiar `push_subscriptions`).
 - **Muertes = IOM MMP (conservador) + Caminando Fronteras (estimación)**: dos fuentes con metodología distinta.
   MMP registra incidentes confirmados (cifra conservadora); CF estima incluyendo desaparecidos (cifra mayor).
   Se muestran como capas separadas (`missing` y `cf_victims`) con su nota metodológica para no mezclarlas.

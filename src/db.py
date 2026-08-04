@@ -601,7 +601,21 @@ def fetch_status() -> list[dict]:
             "FROM collector_runs ORDER BY collector, started_at DESC"
         )
         rows = list(cur.fetchall())
+        cur.execute(
+            "WITH ranked AS ("
+            " SELECT collector, success, "
+            "   ROW_NUMBER() OVER (PARTITION BY collector ORDER BY started_at DESC) AS rn "
+            " FROM collector_runs"
+            "), blocks AS ("
+            " SELECT collector, success, rn, "
+            "   rn - ROW_NUMBER() OVER (PARTITION BY collector, success ORDER BY rn) AS b "
+            " FROM ranked"
+            ") SELECT collector, count(*) AS n FROM blocks WHERE success = false "
+            "GROUP BY collector, b HAVING min(rn) = 1"
+        )
+        consec = {r["collector"]: r["n"] for r in cur.fetchall()}
         for r in rows:
+            r["consecutive_failures"] = consec.get(r["collector"], 0)
             r["started_at"] = r["started_at"].isoformat() if r["started_at"] else None
             r["finished_at"] = r["finished_at"].isoformat() if r["finished_at"] else None
         return rows
