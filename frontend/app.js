@@ -9,7 +9,7 @@ const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "arrivals_route", "news"];
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
 let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
 let lastEvents = [];
-let state = { minLevel: "info", heat: false, dark: true, year: "", trend: false };
+let state = { minLevel: "info", heat: false, dark: true, year: "", trend: false, mode: "historico" };
 const enabledTypes = new Set();
 let summary = null, status = null;
 let trendData = null, chartsLoaded = false;
@@ -839,8 +839,35 @@ function applyChoropleth(events) {
   updateChoroplethLegend(state.trend ? 100 : max, sums.size);
 }
 
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll("#modeFilter button").forEach(b => {
+    b.classList.toggle("active", b.dataset.mode === mode);
+  });
+  const note = document.querySelector(".mode-note");
+  if (note) note.classList.toggle("hidden", mode !== "actual");
+  if (mode === "tendencia") {
+    state.trend = true;
+    if (!state.choropleth) {
+      state.choropleth = true;
+      document.getElementById("choroplethToggle").checked = true;
+    }
+    document.getElementById("trendToggle").checked = true;
+    ensureTrend();
+    loadCountryLayer().then(() => {
+      if (!map.hasLayer(countryLayer)) countryLayer.addTo(map);
+      refreshEvents();
+    }).catch(() => { });
+    return;
+  }
+  refreshEvents();
+}
+
 function initControls(eventTypes) {
   buildTypeFilters(eventTypes);
+  document.querySelectorAll("#modeFilter button").forEach(b => {
+    b.addEventListener("click", () => setMode(b.dataset.mode));
+  });
   document.querySelectorAll("#levelFilters button").forEach(b => {
     b.addEventListener("click", () => {
       document.querySelectorAll("#levelFilters button").forEach(x => x.classList.remove("active"));
@@ -1012,6 +1039,7 @@ async function refreshEvents() {
   const types = [...enabledTypes].join(",");
   const params = new URLSearchParams({ types, min_level: state.minLevel, limit: "5000" });
   if (state.year) params.set("year", state.year);
+  if (state.mode === "actual") params.set("max_age_days", "90");
   let data;
   try {
     const r = await fetch(`/api/events?${params}`);

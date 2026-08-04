@@ -164,6 +164,12 @@
           <p class="timeline-note" data-i18n="tl_note">Reproduce los eventos del mapa en orden cronológico, del más antiguo a hoy.</p>
         </div>
         <h2 data-i18n="map_section">Mapa</h2>
+        <div id="modeFilter" class="filters mode-filters">
+          <button data-mode="historico" class="active" data-i18n="mode_historico">Histórico</button>
+          <button data-mode="actual" data-i18n="mode_actual">Actual (90 d)</button>
+          <button data-mode="tendencia" data-i18n="mode_tendencia">Tendencia</button>
+        </div>
+        <p class="mode-note hidden" data-i18n="mode_note_actual">Eventos de los últimos 90 días.</p>
         <label class="chk"><input type="checkbox" id="heatToggle"> <span data-i18n="heat">Densidad de incidentes (heatmap)</span></label>
         <label class="chk"><input type="checkbox" id="darkToggle" checked> <span data-i18n="dark">Tema oscuro</span></label>
         <label class="chk"><input type="checkbox" id="routesToggle"> <span data-i18n="routes">Rutas migratorias (aprox.)</span></label>
