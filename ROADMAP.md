@@ -152,7 +152,9 @@ se verificaron contra código y render en vivo antes de planear.
       `e9e8b65`, push a GitHub, ROADMAP actualizado. Server == origin/main.
 
 ### Sprint posterior — P2 (experiencia, anotado)
-- [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
+- [x] **Línea de tiempo animada**: botón *play* que reproduce los marcadores en orden cronológico
+      (chunks de 40/60 ms, barra de progreso con fecha, pausa/continuar/reiniciar; los filtros de
+      tipo/nivel/año se respetan; guard de generación para evitar dobles marcadores). Commit `41894a8`.
 - [ ] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa.
 - [ ] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa.
 - [x] Open Graph / meta description completas para compartir en redes (`og.png` 1200×630 + Twitter card;
