@@ -129,6 +129,27 @@ Geocoding fino: `src/geocode.py` (gazetteer + Photon + cache, datos `data/gazett
 `data/iso2.json` generados una vez con Photon/pycountry). Bulos: `src/bulos.py` (14 curados),
 `/api/verify` acepta `q` o `url` (descarga con guardia anti-SSRF).
 
+### Sprint actual — P1.5 (respuesta a la valoración pública — endurecimiento pre-lanzamiento PH 18 ago)
+Preparado el 4 Ago 2026 tras una valoración externa. Priorizado por valor×esfuerzo; los 6 puntos
+se verificaron contra código y render en vivo antes de planear.
+
+- [ ] **Ética / aviso legal**: añadir nota explícita de "no usar para vigilancia ni perfilado de
+      personas" y reforzar el aviso legal actual (no afiliación a UNHCR/IOM/HDX ya existe). Copy +
+      i18n ES/EN.
+- [ ] **Verificador de bulos explícito**: aclarar en la UI (footer `verify_how`) la metodología —
+      "base curada de bulos ya desmentidos por verificadores (Maldita, Newtral, ACNUR), cotejados
+      con eventos reales; no es IA ni exhaustivo; resultado informativo, contrastar con la fuente".
+- [ ] **Frescura visible**: badge "Actualizado: <fecha/hora>" en el mapa (key `updated` ya existe en
+      i18n) y auditar/eliminar la palabra "tiempo real" del copy (la actualización es 2×/día).
+- [ ] **Export robusto**: `appendChild` del `<a>` antes del click (compat Safari), feedback al
+      usuario (toast/cuenta de eventos) y opción de exportar la vista/filtros actuales en vez del
+      dataset completo (hoy `/api/events?limit=5000`).
+- [ ] **Verificar "Cómo se construye"**: el render en vivo (headless, producción) muestra el contenido
+      de `a_t1-3` correctamente en EN; confirmar también ES con Playwright y blindar con texto por
+      defecto en el HTML (progressive enhancement) para que nunca aparezca vacío.
+- [ ] **Cierre**: tests/lint, commit, deploy (`deploy.sh`), sincronizar server ↔ GitHub, actualizar
+      este ROADMAP.
+
 ### Sprint posterior — P2 (experiencia, anotado)
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
 - [ ] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa.
