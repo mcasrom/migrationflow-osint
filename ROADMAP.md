@@ -186,8 +186,9 @@ se verificaron contra código y render en vivo antes de planear.
 - [ ] **SEO para búsquedas globales**: ya hecho el paquete base (`robots.txt`, `sitemap.xml`, canonical,
       JSON-LD WebApplication/WebSite/Dataset, contenido crawlable y CTA en portada); pendiente de
       re-rastreo de Google y monitorización del estado de indexación.
-- [ ] **Material para compartir**: gif/vídeo de 30s de la demo (pendiente) + tarjetas sociales
-      reutilizables (las 7 capturas de `assets/launch/` ya sirven como base).
+- [x] **Material para compartir**: demo de 30s en `assets/launch/demo_30s.gif` y `demo_30s.mp4`
+      (capturas en vivo: play del timeline → tendencia Frontex → gráficos → verificador) + tarjetas
+      sociales reutilizables (las 7 capturas de `assets/launch/`).
 
 ## 5. Problemas conocidos
 
