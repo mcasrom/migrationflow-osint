@@ -175,15 +175,19 @@ se verificaron contra código y render en vivo antes de planear.
       del período por tipo por país; el popup ya no lo hace).
 
 ### Sprint posterior — P4 (lanzamiento y difusión, anotado)
-- [ ] **Reddit**: perfil de proyecto + posts con el mapa y la demo en r/migrationpolicy, r/openstreetmap,
-      r/dataisbeautiful, r/gis y subreddits de datos abiertos (formato imagen estática + enlace).
-- [ ] **Product Hunt**: preparar el "hunt" (galería, descripción, maker comment, FAQ) y plan de votos.
-- [ ] **Show HN / GitHub**: caso de estudio en Hacker News y destacar el repo con README demo.
-- [ ] **X / Telegram**: hilo de lanzamiento con capturas del mapa, tendencias Frontex y verificación de bulos.
+- [x] **Kit de lanzamiento Product Hunt** (`PH_LAUNCH_PACK.md`): taglines, descripción larga, galería
+      (7 capturas reales en `assets/launch/`), maker comment, FAQ, topics, plan de votos día 1 y
+      borradores listos para X/Telegram, Reddit (r/migrationpolicy, r/openstreetmap, r/dataisbeautiful,
+      r/gis, r/datasets) y Show HN. **Pendiente**: publicar el hunt el 18 Ago 2026.
+- [x] **Show HN / GitHub**: README con **demo de capturas** (`assets/launch/*.png`) y enlaces; el
+      borrador del post está en `PH_LAUNCH_PACK.md`.
+- [ ] **Reddit**: publicar los posts preparados el día del lanzamiento (enlace PH).
+- [ ] **X / Telegram**: publicar el hilo preparado el día del lanzamiento (enlace PH).
 - [ ] **SEO para búsquedas globales**: ya hecho el paquete base (`robots.txt`, `sitemap.xml`, canonical,
       JSON-LD WebApplication/WebSite/Dataset, contenido crawlable y CTA en portada); pendiente de
       re-rastreo de Google y monitorización del estado de indexación.
-- [ ] **Material para compartir**: vídeo/gif de 30s de la demo + tarjetas sociales reutilizables.
+- [ ] **Material para compartir**: gif/vídeo de 30s de la demo (pendiente) + tarjetas sociales
+      reutilizables (las 7 capturas de `assets/launch/` ya sirven como base).
 
 ## 5. Problemas conocidos
 

@@ -8,6 +8,14 @@ muertes/desapariciones en ruta y alertas humanitarias, con severidad calculada y
 - **API**: FastAPI · **BD**: PostgreSQL 16 + PostGIS · **Frontend**: Leaflet (PWA)
 - **Repo público**: código abierto, fuentes y criterios documentados
 
+## Capturas
+
+| | |
+|---|---|
+| ![Mapa en vivo](assets/launch/shot_map_en.png) | ![Línea de tiempo animada](assets/launch/shot_timeline.png) |
+| ![Tendencia Frontex](assets/launch/shot_trend.png) | ![Verificador de bulos](assets/launch/shot_verify.png) |
+| ![Gráficos](assets/launch/shot_charts.png) | ![Móvil (PWA)](assets/launch/shot_mobile.png) |
+
 ## Características
 
 - Mapa Leaflet con **clústeres por categoría**, niveles de severidad (`info · warning · alert · critical`),
