@@ -1028,8 +1028,6 @@ function initControls(eventTypes) {
     applyTheme(state.dark);
     buildTypeFilters(status ? status.event_types : null);
     populateYears();
-buildRoutesLegend();
-loadRouteArrivals();
     updateSummary();
     updateSources();
     if (chartsLoaded) { chartsLoaded = false; loadCharts(); }
@@ -1266,6 +1264,8 @@ initVerifier();
 initAlerts();
 initTimeline();
 populateYears();
+buildRoutesLegend();
+loadRouteArrivals();
 state.dark = (localStorage.getItem("mf_theme") || "dark") === "dark";
 try { initMap(); } catch (e) { console.error("initMap:", e); }
 applyTheme(state.dark);

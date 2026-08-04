@@ -1,4 +1,4 @@
-const CACHE = "migrationflow-v15";
+const CACHE = "migrationflow-v16";
 const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "screenshots/mobile.png", "screenshots/wide.png", "vendor/leaflet.js", "vendor/leaflet.css", "vendor/leaflet.markercluster.js", "vendor/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
 
 const STABLE_RE = /\.(png|svg|jpg|jpeg|webp|gif|ico|woff2?|ttf|css|js|geojson|webmanifest)$/;
