@@ -155,7 +155,10 @@ se verificaron contra código y render en vivo antes de planear.
 - [x] **Línea de tiempo animada**: botón *play* que reproduce los marcadores en orden cronológico
       (chunks de 40/60 ms, barra de progreso con fecha, pausa/continuar/reiniciar; los filtros de
       tipo/nivel/año se respetan; guard de generación para evitar dobles marcadores). Commit `41894a8`.
-- [ ] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa.
+- [x] **Capas Histórico / Actual / Tendencia**: control segmentado sobre el mismo mapa — Histórico
+      (todos los eventos activos), Actual (`max_age_days=90`, nota explicativa) y Tendencia (choropleth
+      Frontex vs. año anterior). Respeta filtros de tipo/nivel/año; se combina con la línea de tiempo.
+      Commit `215e153`.
 - [ ] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa.
 - [x] Open Graph / meta description completas para compartir en redes (`og.png` 1200×630 + Twitter card;
       preview de icono y RRSS en `/preview.html`, no indexado).
