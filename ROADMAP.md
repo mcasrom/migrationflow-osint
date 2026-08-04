@@ -159,7 +159,10 @@ se verificaron contra código y render en vivo antes de planear.
       (todos los eventos activos), Actual (`max_age_days=90`, nota explicativa) y Tendencia (choropleth
       Frontex vs. año anterior). Respeta filtros de tipo/nivel/año; se combina con la línea de tiempo.
       Commit `215e153`.
-- [ ] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa.
+- [x] Self-host de Leaflet y plugins (hoy desde CDN unpkg) para eliminar dependencia externa:
+      `frontend/vendor/` con leaflet 1.9.4, markercluster 1.5.3 y heat 0.2.0 (6 ficheros, referencias
+      locales en `index.html`); precache en SW v13 (offline completo). E2E: 0 peticiones a unpkg,
+      mapa + heat + choropleth OK. Commit `99a4cc2`.
 - [x] Open Graph / meta description completas para compartir en redes (`og.png` 1200×630 + Twitter card;
       preview de icono y RRSS en `/preview.html`, no indexado).
 
