@@ -133,22 +133,23 @@ Geocoding fino: `src/geocode.py` (gazetteer + Photon + cache, datos `data/gazett
 Preparado el 4 Ago 2026 tras una valoración externa. Priorizado por valor×esfuerzo; los 6 puntos
 se verificaron contra código y render en vivo antes de planear.
 
-- [ ] **Ética / aviso legal**: añadir nota explícita de "no usar para vigilancia ni perfilado de
-      personas" y reforzar el aviso legal actual (no afiliación a UNHCR/IOM/HDX ya existe). Copy +
-      i18n ES/EN.
-- [ ] **Verificador de bulos explícito**: aclarar en la UI (footer `verify_how`) la metodología —
-      "base curada de bulos ya desmentidos por verificadores (Maldita, Newtral, ACNUR), cotejados
-      con eventos reales; no es IA ni exhaustivo; resultado informativo, contrastar con la fuente".
-- [ ] **Frescura visible**: badge "Actualizado: <fecha/hora>" en el mapa (key `updated` ya existe en
-      i18n) y auditar/eliminar la palabra "tiempo real" del copy (la actualización es 2×/día).
-- [ ] **Export robusto**: `appendChild` del `<a>` antes del click (compat Safari), feedback al
-      usuario (toast/cuenta de eventos) y opción de exportar la vista/filtros actuales en vez del
-      dataset completo (hoy `/api/events?limit=5000`).
-- [ ] **Verificar "Cómo se construye"**: el render en vivo (headless, producción) muestra el contenido
-      de `a_t1-3` correctamente en EN; confirmar también ES con Playwright y blindar con texto por
-      defecto en el HTML (progressive enhancement) para que nunca aparezca vacío.
-- [ ] **Cierre**: tests/lint, commit, deploy (`deploy.sh`), sincronizar server ↔ GitHub, actualizar
-      este ROADMAP.
+- [x] **Ética / aviso legal**: añadida la nota "no usar para vigilancia ni perfilado de personas"
+      (clave `legal_ethics`, párrafo propio en el Aviso legal) + mantenido el no-afiliación a
+      UNHCR/IOM/HDX. i18n ES/EN.
+- [x] **Verificador de bulos explícito**: `verify_how` reescrito con la metodología — base curada de
+      bulos desmentidos por verificadores (Maldita, Newtral, ACNUR) cotejados con eventos reales;
+      "no es IA ni exhaustivo; resultado informativo, contrastar con la fuente". Verificado en vivo
+      tras una consulta real (footer del verificador).
+- [x] **Frescura visible**: el badge "Actualizado" ahora muestra la fecha real de los datos
+      (max `updated_at`/`reported_at` de los eventos cargados, no la hora del cliente). Auditada la
+      palabra "tiempo real": no aparece en el copy (solo en el badge externo de Product Hunt).
+- [x] **Export robusto**: `downloadBlob()` con `appendChild`/`remove` (compat Safari), toast con
+      cuenta de eventos exportados, exporta la **vista actual** (`currentViewEvents()` = `lastEvents`
+      filtrados por `enabledTypes`) en vez del dataset completo. CSV y GeoJSON verificados E2E.
+- [x] **Verificar "Cómo se construye"**: render E2E ES y EN correctos; `a_t1-3` blindados con texto
+      por defecto en el HTML (progressive enhancement) para que nunca aparezcan vacíos.
+- [x] **Cierre**: `node --check` en app.js/i18n.js, E2E headless (Chromium CDP) ES/EN, commit
+      `e9e8b65`, push a GitHub, ROADMAP actualizado. Server == origin/main.
 
 ### Sprint posterior — P2 (experiencia, anotado)
 - [ ] **Línea de tiempo animada**: botón *play* que anima los marcadores por fecha (2024 → hoy).
