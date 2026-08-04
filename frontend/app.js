@@ -723,7 +723,8 @@ function countryPopupHtml(d) {
     <h3>${esc(d.name) || d.iso3}</h3>
     <div class="meta">${d.iso3} · ${t("cp_affected")}: <b>${d.affected != null ? fmt(d.affected) : "—"}</b></div>`;
   if (st.length) {
-    const asof = st[0].reported_at ? fmtDate(st[0].reported_at) : "";
+    const maxDate = st.reduce((m, s) => (s.reported_at && s.reported_at > m) ? s.reported_at : m, "");
+    const asof = maxDate ? fmtDate(maxDate) : "";
     html += `<div class="cp-sub">${t("cp_stocks")}${asof ? ` <span class="cp-date">(${t("cp_latest")} ${asof})</span>` : ""}</div>
       <table class="cp-table">` +
       st.map(s => `<tr><td>${typeLabel(s.type, s.type)}</td><td class="cp-v">${fmt(s.value)}</td></tr>`).join("") +
