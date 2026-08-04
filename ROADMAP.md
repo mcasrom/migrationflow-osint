@@ -176,8 +176,10 @@ se verificaron contra código y render en vivo antes de planear.
       nombres de los colectores afectados; `/api/status` expone `consecutive_failures` (SQL de bloques
       consecutivos sobre `collector_runs`). Verificado con corridas fallidas simuladas.
 - [ ] Export GeoJSON de agregación por país (para descargar el choropleth).
-- [ ] Evitar doble conteo en el choropleth cuando el filtro de año es "todos" (hoy suma todos los snapshots
-      del período por tipo por país; el popup ya no lo hace).
+- [x] Evitar doble conteo en el choropleth con filtro de año "todos": para tipos snapshot
+      (refugees/asylum/refugees_origin/idp/displacement/dtm_idp/arrivals/arrivals_route/cf_victims) se usa el
+      ultimo reported_at por (pais, tipo); incidentes (missing/news) se suman. Verificado con datos reales
+      (RUS: 1.765.383 -> 282.171, -84%).
 
 ### Sprint posterior — P4 (lanzamiento y difusión, anotado)
 - [x] **Kit de lanzamiento Product Hunt** (`PH_LAUNCH_PACK.md`): taglines, descripción larga, galería

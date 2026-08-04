@@ -812,13 +812,28 @@ function applyChoropleth(events) {
   }
   if (!countryLayer || !map.hasLayer(countryLayer)) return;
   const sums = new Map();
+  const SNAP = new Set(["refugees", "asylum", "refugees_origin", "idp",
+                        "displacement", "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]);
+  const latest = new Map();
   for (const ev of events) {
     const iso = eventIso3(ev);
     if (!iso) continue;
     const v = Number(ev.value) || 0;
-    const cur = sums.get(iso) || { sum: 0, count: 0 };
-    cur.sum += v; cur.count += 1;
-    sums.set(iso, cur);
+    if (SNAP.has(ev.event_type)) {
+      const key = iso + "\u0001" + ev.event_type;
+      const rep = ev.reported_at || "";
+      const prev = latest.get(key);
+      if (!prev || rep > prev.reported_at) latest.set(key, { iso, reported_at: rep, value: v });
+    } else {
+      const cur = sums.get(iso) || { sum: 0, count: 0 };
+      cur.sum += v; cur.count += 1;
+      sums.set(iso, cur);
+    }
+  }
+  for (const snap of latest.values()) {
+    const cur = sums.get(snap.iso) || { sum: 0, count: 0 };
+    cur.sum += snap.value; cur.count += 1;
+    sums.set(snap.iso, cur);
   }
   let max = 0;
   sums.forEach(c => { if (c.sum > max) max = c.sum; });
