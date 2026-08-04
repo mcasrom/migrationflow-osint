@@ -11,8 +11,8 @@ Producción: **https://migrationflow.viajeinteligencia.com**
 ## 1. Estado actual (agosto 2026)
 
 - **En vivo y funcionando**: API en `:8600` (PM2 `migrationflow-api`), frontend Leaflet PWA, HTTPS.
-- **7738 eventos activos**: UNHCR 451 · IDMC 80 · IOM DTM 21 · Missing Migrants 7092 ·
-  Frontex entradas 75 · Frontex rutas 6 · Caminando Fronteras 5 · News 8.
+- **8058 eventos activos**: UNHCR 675 · IDMC 121 · IOM DTM 27 · Missing Migrants 7124 ·
+  Frontex entradas 75 · Frontex rutas 6 · Caminando Fronteras 5 · News 25.
 - **Pipeline automático**: cron `15 2,14 * * *` → `scripts/pipeline.sh` (02:15 y 14:15 UTC, sin intervención)
   con **7 colectores**: UNHCR, IDMC, IOM DTM, Missing Migrants, Frontex, Caminando Fronteras, News.
 - **Frontend**: mapa con clústeres por tipo, niveles, heatmap, **tema claro/oscuro persistente**,
@@ -96,6 +96,7 @@ Producción: **https://migrationflow.viajeinteligencia.com**
   Cifra **conservadora** (solo incidentes confirmados); las ONG (p. ej. Caminando Fronteras) reportan más
   muertes — el popup de país muestra nota aclaratoria.
 - **News**: TTL de **14 días** (`SOURCE_TTL_DAYS`); son puntos de actualidad, no stock.
+- **Frescura stocks UNHCR/IDMC (ago 2026)**: los stocks (refugiados/asilo/IDP/desplazamiento) son **datos anuales** (snapshot 31/12). UNHCR_YEARS en src/config.py ahora es **dinamico** [año actual, año-1, año-2]; antes estaba fijo en [2024, 2023] y **todos los paises** mostraban ultimo dato 31/12/2024 aunque la API UNHCR ya publicaba 2025. Tras el fix se ingirio 2025 (RUS: refugiados 10077->11811, origen 96869->99360; affected 277946->282171). El DTM (IOM) es el unico stock casi en real (2026-05). Si un pais no aparece en 2025, es que la fuente no tiene cifra ese año (p. ej. RUS displacement sigue en 2024: IDMC no publica dato 2025 para RF).
 - `deploy.sh` pasa `--host/--port` a `server.py`, pero `server.py` toma `SERVER_HOST/PORT` de `.env`
   (los argumentos se ignoran; inofensivo).
 

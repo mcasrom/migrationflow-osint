@@ -11,3 +11,4 @@ data/*.json
 !data/iso2.json
 *.db
 .DS_Store
+analytics/

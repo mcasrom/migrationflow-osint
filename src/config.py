@@ -3,6 +3,7 @@
 All tunable thresholds, URLs, timeouts and limits live here.
 Import from this module instead of hard-coding values in collectors.
 """
+from datetime import date
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,7 @@ USER_AGENT = "MigrationFlow-OSINT/0.1"
 
 # ── Sources ──────────────────────────────────────────────────
 UNHCR_API = "https://api.unhcr.org/population/v1"
-UNHCR_YEARS = [2024, 2023]            # latest first
+UNHCR_YEARS = [date.today().year, date.today().year - 1, date.today().year - 2]  # latest first
 UNHCR_PAGE_LIMIT = 100
 UNHCR_COOLDOWN_MS = 300
 
