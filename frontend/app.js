@@ -13,6 +13,7 @@ let state = { minLevel: "info", heat: false, dark: true, year: "", trend: false,
 const enabledTypes = new Set();
 let summary = null, status = null;
 let trendData = null, chartsLoaded = false;
+let routeArrivals = null;
 let refreshSeq = 0;
 
 function fmt(n) {
@@ -589,9 +590,42 @@ function initMap() {
   routesLayer = L.layerGroup();
   for (const route of MIGRATION_ROUTES) {
     L.polyline(route.points, { color: route.color, weight: 2.5, opacity: 0.75, dashArray: "6 6" })
-      .bindPopup(`<b>${route.name}</b>`)
+      .bindPopup(() => routePopupHtml(route))
+      .bindTooltip(route.name, { sticky: true, direction: "top" })
       .addTo(routesLayer);
   }
+}
+
+function routePopupHtml(route) {
+  let extra = "";
+  if (routeArrivals && route.frontex) {
+    const rows = route.frontex.map(c => {
+      const a = routeArrivals[c];
+      if (!a) return null;
+      return `<div class="cp-row"><span>${fmtDate(a.reported_at)}</span><b>${fmt(a.value)} ${t("routes_entries")}</b></div>`;
+    }).filter(Boolean);
+    if (rows.length) extra = `<div class="cp-sub">${t("routes_last_month")}</div>${rows.join("")}`;
+  }
+  return `<b>${esc(route.name)}</b>${extra}`;
+}
+async function loadRouteArrivals() {
+  try {
+    const r = await fetch("/api/events?types=arrivals_route&limit=50");
+    const d = await r.json();
+    const by = {};
+    for (const ev of (d.events || [])) by[ev.iso3] = { value: Number(ev.value) || 0, reported_at: ev.reported_at || "" };
+    routeArrivals = by;
+  } catch { routeArrivals = null; }
+}
+function buildRoutesLegend() {
+  const list = document.getElementById("routesLegendList");
+  if (!list) return;
+  list.innerHTML = MIGRATION_ROUTES.map(r =>
+    `<div class="rl-row"><span class="rl-sw" style="border-top-color:${r.color}"></span>${r.name}</div>`).join("");
+}
+function updateRoutesLegend(on) {
+  const el = document.getElementById("routesLegend");
+  if (el) el.classList.toggle("hidden", !on);
 }
 
 function buildTypeFilters(eventTypes) {
@@ -948,8 +982,9 @@ function initControls(eventTypes) {
     applyTheme(!state.dark);
   });
   document.getElementById("routesToggle").addEventListener("change", e => {
-    if (e.target.checked) routesLayer.addTo(map);
+    if (e.target.checked) { routesLayer.addTo(map); loadRouteArrivals(); }
     else map.removeLayer(routesLayer);
+    updateRoutesLegend(e.target.checked);
   });
   document.getElementById("choroplethToggle").addEventListener("change", async e => {
     state.choropleth = e.target.checked;
@@ -993,6 +1028,8 @@ function initControls(eventTypes) {
     applyTheme(state.dark);
     buildTypeFilters(status ? status.event_types : null);
     populateYears();
+buildRoutesLegend();
+loadRouteArrivals();
     updateSummary();
     updateSources();
     if (chartsLoaded) { chartsLoaded = false; loadCharts(); }

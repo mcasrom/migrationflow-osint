@@ -22,6 +22,7 @@ const MIGRATION_ROUTES = [
   {
     id: "med_occ",
     name: "Mediterráneo occidental (Marruecos → España)",
+    frontex: ["ROUTE_WMED"],
     color: "#f59e0b",
     points: [
       [35.00, -6.00], [35.90, -5.30], [36.30, -5.50], [36.70, -4.40],
@@ -31,6 +32,7 @@ const MIGRATION_ROUTES = [
   {
     id: "med_cent",
     name: "Mediterráneo central (Libia/Túnez → Italia)",
+    frontex: ["ROUTE_CMED"],
     color: "#ef4444",
     points: [
       [32.90, 13.20], [34.50, 11.20], [35.90, 14.50], [35.50, 12.60],
@@ -40,6 +42,7 @@ const MIGRATION_ROUTES = [
   {
     id: "med_est",
     name: "Mediterráneo oriental y Balcanes",
+    frontex: ["ROUTE_EMED", "ROUTE_WBAL"],
     color: "#10b981",
     points: [
       [38.60, 26.50], [39.30, 26.00], [40.60, 22.90], [41.60, 22.00],
@@ -49,6 +52,7 @@ const MIGRATION_ROUTES = [
   {
     id: "atlantica",
     name: "Ruta atlántica → Canarias",
+    frontex: ["ROUTE_WAF"],
     color: "#f43f5e",
     points: [
       [14.70, -17.40], [16.90, -25.00], [22.30, -16.50], [24.00, -15.60],
