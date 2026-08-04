@@ -727,7 +727,7 @@ function countryPopupHtml(d) {
     const asof = maxDate ? fmtDate(maxDate) : "";
     html += `<div class="cp-sub">${t("cp_stocks")}${asof ? ` <span class="cp-date">(${t("cp_latest")} ${asof})</span>` : ""}</div>
       <table class="cp-table">` +
-      st.map(s => `<tr><td>${typeLabel(s.type, s.type)}</td><td class="cp-v">${fmt(s.value)}</td></tr>`).join("") +
+      st.map(s => `<tr><td>${typeLabel(s.type, s.type)}</td><td class="cp-v">${fmt(s.value)}<span class="cp-year"> ${(s.reported_at || "").slice(0, 4)}</span></td></tr>`).join("") +
       `</table>`;
   } else {
     html += `<div class="cp-none">${t("cp_no_stock")}</div>`;

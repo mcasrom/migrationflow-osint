@@ -258,6 +258,7 @@ body.is-offline { padding-top: 0; }
 .country-popup .cp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .country-popup .cp-table td { padding: 2px 0; }
 .country-popup .cp-table td.cp-v { text-align: right; font-weight: 700; }
+.country-popup .cp-year { font-size: 10px; font-weight: 400; color: var(--muted); margin-left: 4px; }
 .country-popup .cp-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 2px 0; }
 .country-popup .cp-row b { font-weight: 700; }
 .country-popup .cp-none { font-size: 11px; color: var(--muted); font-style: italic; }
