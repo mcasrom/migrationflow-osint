@@ -13,6 +13,7 @@ let state = { minLevel: "info", heat: false, dark: true, year: "", trend: false 
 const enabledTypes = new Set();
 let summary = null, status = null;
 let trendData = null, chartsLoaded = false;
+let refreshSeq = 0;
 
 function fmt(n) {
   if (n == null) return "—";
@@ -439,6 +440,81 @@ function exportGeoJSON() {
     { type: "application/geo+json" });
   downloadBlob(blob, "migrationflow_events.geojson");
   showToast(t("exp_ok").replace("{n}", String(feats.length)).replace("{fmt}", "GeoJSON"));
+}
+
+// ── Línea de tiempo animada ────────────────────────────────────────
+let timeline = null;
+
+function tlFinish() {
+  if (timeline && timeline.iv) clearInterval(timeline.iv);
+  timeline = null;
+  const pb = document.getElementById("tlPlay");
+  const reset = document.getElementById("tlReset");
+  const bar = document.getElementById("tlBar");
+  if (pb) { pb.textContent = t("tl_play"); pb.classList.remove("playing"); }
+  if (reset) reset.classList.add("hidden");
+  setTimeout(() => { if (bar) bar.classList.add("hidden"); }, 2000);
+}
+
+function tlStop(showAll) {
+  const active = !!timeline;
+  if (timeline && timeline.iv) clearInterval(timeline.iv);
+  timeline = null;
+  const pb = document.getElementById("tlPlay");
+  const reset = document.getElementById("tlReset");
+  const bar = document.getElementById("tlBar");
+  if (pb) { pb.textContent = t("tl_play"); pb.classList.remove("playing"); }
+  if (reset) reset.classList.add("hidden");
+  if (bar) bar.classList.add("hidden");
+  if (showAll && active) refreshEvents();
+}
+
+function tlStart() {
+  if (timeline) return;
+  const events = currentViewEvents()
+    .filter(ev => LEVEL_RANK[ev.level] >= LEVEL_RANK[state.minLevel])
+    .sort((a, b) =>
+      (Date.parse(a.reported_at || a.updated_at || "") || 0) -
+      (Date.parse(b.reported_at || b.updated_at || "") || 0));
+  if (!events.length) { showToast(t("exp_empty")); return; }
+  refreshSeq++;
+  for (const tt of TYPE_ORDER) layers[tt].clearLayers();
+  const pb = document.getElementById("tlPlay");
+  const reset = document.getElementById("tlReset");
+  const bar = document.getElementById("tlBar");
+  const dateEl = document.getElementById("tlDate");
+  const fill = document.getElementById("tlFill");
+  if (pb) { pb.textContent = t("tl_pause"); pb.classList.add("playing"); }
+  if (reset) reset.classList.remove("hidden");
+  if (bar) bar.classList.remove("hidden");
+  const CHUNK = 40;
+  let idx = 0;
+  const step = () => {
+    for (const ev of events.slice(idx, idx + CHUNK)) placeEvent(ev);
+    idx += CHUNK;
+    const cur = events[idx - 1];
+    if (dateEl && cur) dateEl.textContent = fmtDate(cur.reported_at || cur.updated_at);
+    if (fill) fill.style.width = Math.round((idx / events.length) * 100) + "%";
+    if (idx >= events.length) tlFinish();
+  };
+  timeline = { iv: setInterval(step, 60), step };
+}
+
+function initTimeline() {
+  const pb = document.getElementById("tlPlay");
+  const reset = document.getElementById("tlReset");
+  if (pb) pb.addEventListener("click", () => {
+    if (!timeline) return tlStart();
+    if (timeline.iv) {
+      clearInterval(timeline.iv);
+      timeline.iv = null;
+      pb.textContent = t("tl_resume");
+    } else {
+      timeline.iv = setInterval(timeline.step, 60);
+      pb.textContent = t("tl_pause");
+    }
+  });
+  if (reset) reset.addEventListener("click", () => tlStop(true));
 }
 
 function initIntro() {
@@ -931,6 +1007,8 @@ function placeEvent(ev) {
 }
 
 async function refreshEvents() {
+  const seq = ++refreshSeq;
+  tlStop(false);
   const types = [...enabledTypes].join(",");
   const params = new URLSearchParams({ types, min_level: state.minLevel, limit: "5000" });
   if (state.year) params.set("year", state.year);
@@ -940,6 +1018,7 @@ async function refreshEvents() {
     data = await r.json();
   } catch { return; }
   const events = (data && Array.isArray(data.events)) ? data.events : [];
+  if (seq !== refreshSeq) return;
   lastEvents = events;
   for (const t of TYPE_ORDER) layers[t].clearLayers();
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
@@ -1050,6 +1129,7 @@ initShare();
 initInstall();
 initVerifier();
 initAlerts();
+initTimeline();
 populateYears();
 state.dark = (localStorage.getItem("mf_theme") || "dark") === "dark";
 try { initMap(); } catch (e) { console.error("initMap:", e); }

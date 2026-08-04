@@ -156,6 +156,16 @@ header .sub { font-size: 11px; color: var(--muted); }
   background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
   cursor: pointer; accent-color: var(--accent);
 }
+.timeline { margin: 2px 0 6px; }
+.timeline-btns { display: flex; gap: 6px; }
+.timeline-btns .btn-ghost { flex: 1; width: auto; margin: 0; }
+.timeline-btns .btn-ghost.reset { flex: 0 0 auto; padding: 9px 14px; }
+.timeline-btns .btn-ghost.playing { background: rgba(56,189,248,.18); }
+.timeline-note { font-size: 10px; color: var(--muted); line-height: 1.45; margin-top: 6px; }
+.timeline-bar { margin-top: 8px; }
+.timeline-date { font-size: 11px; color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; }
+.timeline-track { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; border: 1px solid var(--line); }
+.timeline-fill { height: 100%; width: 0%; background: var(--accent); transition: width .1s linear; }
 .route-legend { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 .route-legend b { color: var(--text); }
 .swatch { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }

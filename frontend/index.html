@@ -151,6 +151,18 @@
         <select id="yearFilter" class="year-select">
           <option value="">Todos los años</option>
         </select>
+        <h2 data-i18n="tl_heading">Evolución en el tiempo</h2>
+        <div class="timeline">
+          <div class="timeline-btns">
+            <button id="tlPlay" class="btn-ghost" data-i18n="tl_play">▶ Reproducir evolución</button>
+            <button id="tlReset" class="btn-ghost reset hidden" data-i18n="tl_reset">✕ Reiniciar</button>
+          </div>
+          <div id="tlBar" class="timeline-bar hidden">
+            <span id="tlDate" class="timeline-date">—</span>
+            <div class="timeline-track"><div id="tlFill" class="timeline-fill"></div></div>
+          </div>
+          <p class="timeline-note" data-i18n="tl_note">Reproduce los eventos del mapa en orden cronológico, del más antiguo a hoy.</p>
+        </div>
         <h2 data-i18n="map_section">Mapa</h2>
         <label class="chk"><input type="checkbox" id="heatToggle"> <span data-i18n="heat">Densidad de incidentes (heatmap)</span></label>
         <label class="chk"><input type="checkbox" id="darkToggle" checked> <span data-i18n="dark">Tema oscuro</span></label>
