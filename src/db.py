@@ -344,6 +344,42 @@ def fetch_events(types: Optional[list] = None, min_level: Optional[str] = None,
         release_conn(conn)
 
 
+def fetch_choropleth(year: Optional[int] = None) -> dict:
+    """Agregacion por pais para el choropleth: stocks (ultimo dato por tipo) +
+    incidentes (suma), sin depender del limite de /api/events."""
+    SNAP = ["refugees", "asylum", "refugees_origin", "idp", "displacement",
+            "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]
+    INC = ["missing", "news"]
+    yw = " AND date_part('year', reported_at) = %s" if year else ""
+    snap = f"""
+        SELECT iso3, event_type, value, 1 AS count FROM (
+            SELECT DISTINCT ON (iso3, event_type) iso3, event_type, value
+            FROM events
+            WHERE status='active' AND event_type = ANY(%s) {yw}
+              AND iso3 IS NOT NULL AND iso3 <> '' AND value IS NOT NULL
+            ORDER BY iso3, event_type, reported_at DESC
+        ) s"""
+    inc = f"""
+        SELECT iso3, event_type, sum(value) AS value, count(*) AS count
+        FROM events
+        WHERE status='active' AND event_type = ANY(%s) {yw}
+          AND iso3 IS NOT NULL AND iso3 <> '' AND value IS NOT NULL
+        GROUP BY iso3, event_type"""
+    params = [SNAP, INC] if not year else [SNAP, year, INC, year]
+    conn = get_conn()
+    try:
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(f"{snap} UNION ALL {inc}", params)
+        rows = [
+            {"iso3": r["iso3"], "event_type": r["event_type"],
+             "sum": float(r["value"] or 0), "count": int(r["count"] or 1)}
+            for r in cur.fetchall()
+        ]
+        return {"rows": rows}
+    finally:
+        release_conn(conn)
+
+
 def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
     """Resumen de un país: stocks (último dato disponible) + actividad en los
     últimos `days` días + delta vs. el período previo equivalente."""

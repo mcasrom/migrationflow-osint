@@ -805,6 +805,22 @@ function trendColor(pct) {
   return `rgb(${r},${g},${b})`;
 }
 
+let choroData = null;
+let choroYear = null;
+function applyChoroNow() {
+  applyChoropleth(lastEvents.filter(ev => enabledTypes.has(ev.event_type)));
+}
+async function refreshChoro() {
+  if (!state.choropleth) { choroData = null; return; }
+  if (choroData && choroYear === state.year) { applyChoroNow(); return; }
+  try {
+    const q = state.year ? `?year=${state.year}` : "";
+    choroData = await (await fetch(`/api/choropleth${q}`)).json();
+    choroYear = state.year;
+  } catch { choroData = null; choroYear = null; }
+  applyChoroNow();
+}
+
 function applyChoropleth(events) {
   if (!state.choropleth) {
     if (countryLayer) countryLayer.setStyle(CHORO_BASE_STYLE);
@@ -813,28 +829,38 @@ function applyChoropleth(events) {
   }
   if (!countryLayer || !map.hasLayer(countryLayer)) return;
   const sums = new Map();
-  const SNAP = new Set(["refugees", "asylum", "refugees_origin", "idp",
-                        "displacement", "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]);
-  const latest = new Map();
-  for (const ev of events) {
-    const iso = eventIso3(ev);
-    if (!iso) continue;
-    const v = Number(ev.value) || 0;
-    if (SNAP.has(ev.event_type)) {
-      const key = iso + "\u0001" + ev.event_type;
-      const rep = ev.reported_at || "";
-      const prev = latest.get(key);
-      if (!prev || rep > prev.reported_at) latest.set(key, { iso, reported_at: rep, value: v });
-    } else {
-      const cur = sums.get(iso) || { sum: 0, count: 0 };
-      cur.sum += v; cur.count += 1;
-      sums.set(iso, cur);
+  if (choroData && Array.isArray(choroData.rows)) {
+    for (const row of choroData.rows) {
+      if (!enabledTypes.has(row.event_type)) continue;
+      const cur = sums.get(row.iso3) || { sum: 0, count: 0 };
+      cur.sum += Number(row.sum) || 0;
+      cur.count += Number(row.count) || 0;
+      sums.set(row.iso3, cur);
     }
-  }
-  for (const snap of latest.values()) {
-    const cur = sums.get(snap.iso) || { sum: 0, count: 0 };
-    cur.sum += snap.value; cur.count += 1;
-    sums.set(snap.iso, cur);
+  } else {
+    const SNAP = new Set(["refugees", "asylum", "refugees_origin", "idp",
+                          "displacement", "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]);
+    const latest = new Map();
+    for (const ev of events) {
+      const iso = eventIso3(ev);
+      if (!iso) continue;
+      const v = Number(ev.value) || 0;
+      if (SNAP.has(ev.event_type)) {
+        const key = iso + "\u0001" + ev.event_type;
+        const rep = ev.reported_at || "";
+        const prev = latest.get(key);
+        if (!prev || rep > prev.reported_at) latest.set(key, { iso, reported_at: rep, value: v });
+      } else {
+        const cur = sums.get(iso) || { sum: 0, count: 0 };
+        cur.sum += v; cur.count += 1;
+        sums.set(iso, cur);
+      }
+    }
+    for (const snap of latest.values()) {
+      const cur = sums.get(snap.iso) || { sum: 0, count: 0 };
+      cur.sum += snap.value; cur.count += 1;
+      sums.set(snap.iso, cur);
+    }
   }
   let max = 0;
   sums.forEach(c => { if (c.sum > max) max = c.sum; });
@@ -1092,7 +1118,8 @@ async function refreshEvents() {
       gradient: { 0.2: "#ffb020", 0.5: "#ff7043", 0.8: "#f43f5e", 1: "#ff0040" } });
     heatLayer.addTo(map);
   }
-  applyChoropleth(events);
+  if (state.choropleth) { await refreshChoro(); }
+  else { applyChoropleth(events); }
   if (state.choropleth && state.trend && !trendData) ensureTrend().then(() => applyChoropleth(events));
   document.getElementById("lastUpdate").textContent = `${t("updated")} ${dataFreshness(events)}`;
 }

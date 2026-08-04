@@ -88,6 +88,11 @@ def api_status():
     return {"collectors": fetch_status(), "event_types": EVENT_TYPES}
 
 
+@app.get("/api/choropleth")
+def api_choropleth(year: Optional[int] = Query(None, description="Año del dato (vacío = todos)")):
+    return db.fetch_choropleth(year)
+
+
 @app.get("/api/arrivals/series")
 def api_arrivals_series(
     country: Optional[str] = Query(None, description="ISO3 (vacío = serie global)"),
