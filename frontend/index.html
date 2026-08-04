@@ -286,6 +286,7 @@
           de las fuentes citadas y pueden estar sujetas a revisión. Los eventos que se muestran no constituyen una clasificación
           oficial de crisis ni sustituyen la información de las agencias humanitarias.
         </p>
+        <p class="legal" data-i18n-html="legal_ethics"></p>
       </section>
     </div>
 
@@ -312,9 +313,9 @@
       <section class="panel-section">
         <h2 data-i18n="a_tech">Cómo se construye</h2>
         <ul class="about">
-          <li data-i18n-html="a_t1"></li>
-          <li data-i18n-html="a_t2"></li>
-          <li data-i18n-html="a_t3"></li>
+          <li data-i18n-html="a_t1"><b>Recopilación</b>: pipeline en Python que consulta dos veces al día las APIs y CSV oficiales (UNHCR, IDMC, IOM, HDX) y el RSS de ReliefWeb.</li>
+          <li data-i18n-html="a_t2"><b>Procesamiento</b>: geolocalización, clasificación por tipo y severidad, y expiración automática de los eventos cuando la fuente deja de reportarlos.</li>
+          <li data-i18n-html="a_t3"><b>Publicación</b>: API REST + mapa Leaflet como PWA, alojado en un servidor propio; todo el código es abierto en GitHub.</li>
         </ul>
       </section>
 

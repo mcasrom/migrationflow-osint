@@ -376,18 +376,12 @@ function csvCell(v) {
 }
 
 async function exportCSV() {
-  try {
-    const r = await fetch("/api/events?limit=5000");
-    const data = await r.json();
-    const rows = data.events.map(ev => CSV_FIELDS.map(f => csvCell(ev[f])).join(","));
-    const csv = "\ufeff" + CSV_FIELDS.join(",") + "\r\n" + rows.join("\r\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "migrationflow_events.csv";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  } catch { }
+  const events = currentViewEvents();
+  if (!events.length) { showToast(t("exp_empty")); return; }
+  const rows = events.map(ev => CSV_FIELDS.map(f => csvCell(ev[f])).join(","));
+  const csv = "\ufeff" + CSV_FIELDS.join(",") + "\r\n" + rows.join("\r\n");
+  downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), "migrationflow_events.csv");
+  showToast(t("exp_ok").replace("{n}", String(events.length)).replace("{fmt}", "CSV"));
 }
 
 function initKofi() {
@@ -405,27 +399,46 @@ function initKofi() {
   }
 }
 
-async function exportGeoJSON() {
-  try {
-    const r = await fetch("/api/events?limit=5000");
-    const data = await r.json();
-    const feats = data.events.map(ev => ({
-      type: "Feature",
-      properties: {
-        source: ev.source, event_type: ev.event_type, level: ev.level,
-        title: ev.title, value: ev.value, country: ev.country,
-        reported_at: ev.reported_at, source_id: ev.source_id,
-      },
-      geometry: { type: "Point", coordinates: [ev.lon, ev.lat] },
-    }));
-    const blob = new Blob([JSON.stringify({ type: "FeatureCollection", features: feats }, null, 2)],
-      { type: "application/geo+json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "migrationflow_events.geojson";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  } catch { }
+function currentViewEvents() {
+  return lastEvents.filter(ev => enabledTypes.has(ev.event_type));
+}
+
+function downloadBlob(blob, filename) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function dataFreshness(events) {
+  let maxTs = 0;
+  for (const ev of events) {
+    const ts = Date.parse(ev.updated_at || ev.reported_at || "");
+    if (isFinite(ts) && ts > maxTs) maxTs = ts;
+  }
+  return maxTs ? fmtTime(new Date(maxTs)) : fmtTime(new Date());
+}
+
+function exportGeoJSON() {
+  const events = currentViewEvents();
+  if (!events.length) { showToast(t("exp_empty")); return; }
+  const feats = events.map(ev => ({
+    type: "Feature",
+    properties: {
+      source: ev.source, event_type: ev.event_type, level: ev.level,
+      title: ev.title, value: ev.value, country: ev.country,
+      reported_at: ev.reported_at, source_id: ev.source_id,
+    },
+    geometry: { type: "Point", coordinates: [ev.lon, ev.lat] },
+  }));
+  const blob = new Blob([JSON.stringify({ type: "FeatureCollection", features: feats }, null, 2)],
+    { type: "application/geo+json" });
+  downloadBlob(blob, "migrationflow_events.geojson");
+  showToast(t("exp_ok").replace("{n}", String(feats.length)).replace("{fmt}", "GeoJSON"));
 }
 
 function initIntro() {
@@ -945,7 +958,7 @@ async function refreshEvents() {
   }
   applyChoropleth(events);
   if (state.choropleth && state.trend && !trendData) ensureTrend().then(() => applyChoropleth(events));
-  document.getElementById("lastUpdate").textContent = `${t("updated")} ${fmtTime(new Date())}`;
+  document.getElementById("lastUpdate").textContent = `${t("updated")} ${dataFreshness(events)}`;
 }
 
 async function refreshSummary() {
