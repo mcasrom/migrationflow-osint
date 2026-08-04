@@ -1,5 +1,7 @@
-const CACHE = "migrationflow-v13";
-const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "vendor/leaflet.js", "vendor/leaflet.css", "vendor/leaflet.markercluster.js", "vendor/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
+const CACHE = "migrationflow-v14";
+const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "screenshots/mobile.png", "screenshots/wide.png", "vendor/leaflet.js", "vendor/leaflet.css", "vendor/leaflet.markercluster.js", "vendor/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
+
+const STABLE_RE = /\.(png|svg|jpg|jpeg|webp|gif|ico|woff2?|ttf|css|js|geojson|webmanifest)$/;
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
@@ -38,7 +40,11 @@ self.addEventListener("notificationclick", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
+  if (e.request.method !== "GET") return;
+  if (url.origin !== location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
+
+  // Página principal: network-first (siempre fresca), fallback a caché.
   if (e.request.mode === "navigate") {
     e.respondWith(
       fetch(e.request)
@@ -51,6 +57,28 @@ self.addEventListener("fetch", (e) => {
     );
     return;
   }
+
+  // Assets estables (js, css, imágenes, geojson): cache-first con actualización
+  // en segundo plano (stale-while-revalidate). Carga instantánea offline.
+  if (STABLE_RE.test(url.pathname)) {
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        const network = fetch(e.request)
+          .then((res) => {
+            if (res && res.ok) {
+              const copy = res.clone();
+              caches.open(CACHE).then((c) => c.put(e.request, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || network;
+      })
+    );
+    return;
+  }
+
+  // Resto: network-first con fallback a caché.
   e.respondWith(
     fetch(e.request)
       .then((res) => {

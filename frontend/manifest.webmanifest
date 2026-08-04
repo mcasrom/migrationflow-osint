@@ -1,12 +1,18 @@
 {
+  "id": "/",
   "name": "MigrationFlow OSINT",
   "short_name": "MigrationFlow",
   "description": "Flujos migratorios y desplazamiento forzado a escala global (UNHCR · IDMC · IOM DTM · MMP)",
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "lang": "es",
+  "categories": ["news", "maps", "productivity"],
+  "screenshots": [
+    { "src": "/screenshots/wide.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide", "label": "Mapa global de flujos migratorios y desplazamiento" },
+    { "src": "/screenshots/mobile.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "Mapa en movil" }
+  ],
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

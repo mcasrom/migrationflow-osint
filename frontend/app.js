@@ -43,6 +43,19 @@ function showToast(msg) {
   el._t = setTimeout(() => el.classList.remove("show"), 2400);
 }
 
+function setOfflineBanner(off) {
+  const b = document.getElementById("offlineBanner");
+  if (b) b.classList.toggle("hidden", !off);
+  document.body.classList.toggle("is-offline", off);
+}
+function onNetworkFail() {
+  if (!navigator.onLine) { setOfflineBanner(true); return; }
+  try { showToast(t("network_error")); } catch (e) { }
+}
+window.addEventListener("offline", () => setOfflineBanner(true));
+window.addEventListener("online", () => setOfflineBanner(false));
+setOfflineBanner(!navigator.onLine);
+
 function applyTheme(dark) {
   state.dark = dark;
   if (map) {
@@ -1044,7 +1057,7 @@ async function refreshEvents() {
   try {
     const r = await fetch(`/api/events?${params}`);
     data = await r.json();
-  } catch { return; }
+  } catch { onNetworkFail(); return; }
   const events = (data && Array.isArray(data.events)) ? data.events : [];
   if (seq !== refreshSeq) return;
   lastEvents = events;
@@ -1076,7 +1089,7 @@ async function refreshSummary() {
     document.getElementById("totalBadge").innerHTML =
       `${fmt(summary.total_active)} <span data-i18n="events">${t("events")}</span>`;
     updateSummary();
-  } catch { }
+  } catch { onNetworkFail(); }
 }
 
 async function updateSummary() {
@@ -1129,7 +1142,7 @@ async function loadAll() {
     }
     updateSummary();
     updateSources();
-  } catch { }
+  } catch { onNetworkFail(); }
   await refreshEvents();
 }
 

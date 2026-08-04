@@ -30,6 +30,10 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MigrationFlow OSINT">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -85,6 +89,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="offlineBanner" class="offline-banner hidden" role="status" data-i18n="offline_banner">Sin conexión — mostrando datos guardados</div>
 <noscript>
   <div class="seo-fallback">
     <h2>El mundo en movimiento, en un mapa</h2>

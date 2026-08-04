@@ -3,6 +3,8 @@ const I18N = {
   es: {
     sub: "Flujos migratorios y desplazamiento forzado a escala global",
     events: "eventos",
+    offline_banner: "Sin conexion - mostrando datos guardados",
+    network_error: "Error de red. Revisa tu conexion.",
     tab_data: "Datos",
     tab_info: "Fuentes",
     cat: "Categorías",
@@ -148,6 +150,8 @@ const I18N = {
   en: {
     sub: "Migration flows and forced displacement at a global scale",
     events: "events",
+    offline_banner: "Offline - showing cached data",
+    network_error: "Network error. Check your connection.",
     tab_data: "Data",
     tab_info: "Sources",
     cat: "Categories",
