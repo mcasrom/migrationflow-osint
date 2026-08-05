@@ -348,7 +348,8 @@ def fetch_choropleth(year: Optional[int] = None) -> dict:
     """Agregacion por pais para el choropleth: stocks (ultimo dato por tipo) +
     incidentes (suma), sin depender del limite de /api/events."""
     SNAP = ["refugees", "asylum", "refugees_origin", "idp", "displacement",
-            "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]
+            "dtm_idp", "asylum_origin", "ooc_origin", "oip_origin",
+            "arrivals", "arrivals_route", "cf_victims"]
     INC = ["missing", "news"]
     yw = " AND date_part('year', reported_at) = %s" if year else ""
     snap = f"""
@@ -398,7 +399,7 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
         cur.execute(
             "SELECT DISTINCT ON (event_type) event_type, value, reported_at "
             "FROM events WHERE iso3=%s AND status='active' "
-            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
             "ORDER BY event_type, reported_at DESC", (iso3,))
         stocks = [
             {"type": r["event_type"], "value": r["value"],
@@ -440,7 +441,7 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
             "SELECT round(sum(value)::numeric) FROM ("
             "SELECT DISTINCT ON (event_type) value FROM events "
             "WHERE iso3=%s AND status='active' "
-            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
             "ORDER BY event_type, reported_at DESC) t", (iso3,))
         affected = cur.fetchone()["round"]
 
@@ -480,7 +481,7 @@ def fetch_summary(year: Optional[int] = None) -> dict:
             f"SELECT round(sum(value)::numeric) FROM ("
             "SELECT DISTINCT ON (iso3, event_type) value FROM events "
             f"WHERE status='active' AND value IS NOT NULL {yw} "
-            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
             "ORDER BY iso3, event_type, reported_at DESC) t", params)
         sum_value = cur.fetchone()[0]
         return {
@@ -618,7 +619,7 @@ def fetch_top_countries(limit: int = 10) -> list[dict]:
             "SELECT DISTINCT ON (iso3, event_type) iso3, country, value "
             "FROM events WHERE status='active' AND value IS NOT NULL "
             "AND event_type IN "
-            "('refugees','asylum','refugees_origin','idp','displacement','dtm_idp') "
+            "('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
             "ORDER BY iso3, event_type, reported_at DESC) t "
             "GROUP BY iso3, country ORDER BY value DESC LIMIT %s", (int(limit),))
         return [{"iso3": r["iso3"], "country": r["country"], "value": float(r["value"])}

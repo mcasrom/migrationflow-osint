@@ -3,8 +3,8 @@ const LEVEL_RANK = { info: 0, warning: 1, alert: 2, critical: 3 };
 const LEVEL_COLOR = { info: "#4a9eff", warning: "#ffb020", alert: "#ff7043", critical: "#f43f5e" };
 const KOFI_URL = "https://ko-fi.com/m_castillo";
 
-const TYPE_ORDER = ["refugees", "asylum", "idp", "displacement", "dtm_idp", "refugees_origin", "arrivals", "arrivals_route", "missing", "cf_victims", "news"];
-const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "arrivals_route", "news"];
+const TYPE_ORDER = ["refugees", "asylum", "refugees_origin", "asylum_origin", "ooc_origin", "oip_origin", "idp", "displacement", "dtm_idp", "arrivals", "arrivals_route", "missing", "cf_victims", "news"];
+const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "asylum_origin", "ooc_origin", "oip_origin", "arrivals_route", "news"];
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
 let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
@@ -763,6 +763,9 @@ function countryPopupHtml(d) {
       <table class="cp-table">` +
       st.map(s => `<tr><td>${typeLabel(s.type, s.type)}</td><td class="cp-v">${fmt(s.value)}<span class="cp-year"> ${(s.reported_at || "").slice(0, 4)}</span></td></tr>`).join("") +
       `</table>`;
+    if (st.some(x => x.type === "oip_origin" || x.type === "ooc_origin")) {
+      html += `<div class="cp-note">${t("cp_note_categories")}</div>`;
+    }
   } else {
     html += `<div class="cp-none">${t("cp_no_stock")}</div>`;
   }
@@ -873,8 +876,9 @@ function applyChoropleth(events) {
       sums.set(row.iso3, cur);
     }
   } else {
-    const SNAP = new Set(["refugees", "asylum", "refugees_origin", "idp",
-                          "displacement", "dtm_idp", "arrivals", "arrivals_route", "cf_victims"]);
+    const SNAP = new Set(["refugees", "asylum", "refugees_origin", "asylum_origin",
+                          "ooc_origin", "oip_origin", "idp", "displacement", "dtm_idp",
+                          "arrivals", "arrivals_route", "cf_victims"]);
     const latest = new Map();
     for (const ev of events) {
       const iso = eventIso3(ev);

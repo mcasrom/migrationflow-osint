@@ -86,6 +86,25 @@ class UNHCRCollector(BaseCollector):
                             f"{fmt_int(idps)} desplazados internos en {name}",
                             row))
 
+                    asylum_origin = _num(row.get("asylum_seekers"))
+                    ooc = _num(row.get("ooc"))
+                    oip = _num(row.get("oip"))
+                    if asylum_origin >= MIN_VALUE["asylum_origin"]:
+                        events.append(self._stock_event(
+                            iso, name, year, "asylum_origin", asylum_origin,
+                            f"{fmt_int(asylum_origin)} solicitantes de asilo originarios de {name}",
+                            row))
+                    if ooc >= MIN_VALUE["ooc_origin"]:
+                        events.append(self._stock_event(
+                            iso, name, year, "ooc_origin", ooc,
+                            f"{fmt_int(ooc)} otras personas de interés (OOC) originarias de {name}",
+                            row))
+                    if oip >= MIN_VALUE["oip_origin"]:
+                        events.append(self._stock_event(
+                            iso, name, year, "oip_origin", oip,
+                            f"{fmt_int(oip)} personas en necesidad de protección internacional (OIP) originarias de {name}",
+                            row))
+
                 for row in coa_rows:
                     iso = (row.get("coa_iso") or row.get("coa") or "").upper()
                     geo = geo_for(iso) if iso not in ("-", "") else None
