@@ -868,12 +868,24 @@ function applyChoropleth(events) {
   if (!countryLayer || !map.hasLayer(countryLayer)) return;
   const sums = new Map();
   if (choroData && Array.isArray(choroData.rows)) {
+    const IDP = new Set(["idp", "displacement", "dtm_idp"]);
+    const idpMax = new Map();
     for (const row of choroData.rows) {
       if (!enabledTypes.has(row.event_type)) continue;
+      if (IDP.has(row.event_type)) {
+        const cur = idpMax.get(row.iso3) || 0;
+        idpMax.set(row.iso3, Math.max(cur, Number(row.sum) || 0));
+        continue;
+      }
       const cur = sums.get(row.iso3) || { sum: 0, count: 0 };
       cur.sum += Number(row.sum) || 0;
       cur.count += Number(row.count) || 0;
       sums.set(row.iso3, cur);
+    }
+    for (const [iso, v] of idpMax) {
+      const cur = sums.get(iso) || { sum: 0, count: 0 };
+      cur.sum += v; cur.count += 1;
+      sums.set(iso, cur);
     }
   } else {
     const SNAP = new Set(["refugees", "asylum", "refugees_origin", "asylum_origin",
@@ -888,17 +900,29 @@ function applyChoropleth(events) {
         const key = iso + "\u0001" + ev.event_type;
         const rep = ev.reported_at || "";
         const prev = latest.get(key);
-        if (!prev || rep > prev.reported_at) latest.set(key, { iso, reported_at: rep, value: v });
+        if (!prev || rep > prev.reported_at) latest.set(key, { iso, type: ev.event_type, reported_at: rep, value: v });
       } else {
         const cur = sums.get(iso) || { sum: 0, count: 0 };
         cur.sum += v; cur.count += 1;
         sums.set(iso, cur);
       }
     }
+    const IDP = new Set(["idp", "displacement", "dtm_idp"]);
+    const idpMax = new Map();
     for (const snap of latest.values()) {
+      if (IDP.has(snap.type)) {
+        const cur = idpMax.get(snap.iso) || 0;
+        idpMax.set(snap.iso, Math.max(cur, snap.value));
+        continue;
+      }
       const cur = sums.get(snap.iso) || { sum: 0, count: 0 };
       cur.sum += snap.value; cur.count += 1;
       sums.set(snap.iso, cur);
+    }
+    for (const [iso, v] of idpMax) {
+      const cur = sums.get(iso) || { sum: 0, count: 0 };
+      cur.sum += v; cur.count += 1;
+      sums.set(iso, cur);
     }
   }
   let max = 0;

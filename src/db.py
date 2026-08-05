@@ -437,13 +437,12 @@ def fetch_country_summary(iso3: str, days: int = 365) -> Optional[dict]:
                 "sum": float(r["total"]) if r["total"] is not None else None,
             }
 
-        cur.execute(
-            "SELECT round(sum(value)::numeric) FROM ("
-            "SELECT DISTINCT ON (event_type) value FROM events "
-            "WHERE iso3=%s AND status='active' "
-            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
-            "ORDER BY event_type, reported_at DESC) t", (iso3,))
-        affected = cur.fetchone()["round"]
+        IDP_SOURCES = ("idp", "displacement", "dtm_idp")
+        affected = float(sum((s["value"] or 0) for s in stocks))
+        idp_vals = [float(s["value"] or 0) for s in stocks if s["type"] in IDP_SOURCES]
+        if len(idp_vals) > 1:
+            affected -= sum(idp_vals) - max(idp_vals)
+        affected = round(affected)
 
         cur.execute(
             "SELECT value, to_char(reported_at, 'YYYY') AS year FROM events "
@@ -478,11 +477,17 @@ def fetch_summary(year: Optional[int] = None) -> dict:
         cur.execute(f"SELECT count(*) FROM events WHERE status='active' AND value IS NOT NULL {yw}", params)
         with_value = cur.fetchone()[0]
         cur.execute(
-            f"SELECT round(sum(value)::numeric) FROM ("
-            "SELECT DISTINCT ON (iso3, event_type) value FROM events "
-            f"WHERE status='active' AND value IS NOT NULL {yw} "
-            "AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
-            "ORDER BY iso3, event_type, reported_at DESC) t", params)
+            f"""SELECT round(sum(v)::numeric) FROM (
+                SELECT iso3,
+                  COALESCE(sum(value) FILTER (WHERE event_type NOT IN ('idp','displacement','dtm_idp')), 0)
+                  + COALESCE(max(value) FILTER (WHERE event_type IN ('idp','displacement','dtm_idp')), 0) AS v
+                FROM (
+                  SELECT DISTINCT ON (iso3, event_type) iso3, event_type, value FROM events
+                  WHERE status='active' AND value IS NOT NULL {yw}
+                  AND event_type IN ('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin')
+                  ORDER BY iso3, event_type, reported_at DESC
+                ) t GROUP BY iso3
+            ) g""", params)
         sum_value = cur.fetchone()[0]
         return {
             "total_active": total,
@@ -615,8 +620,11 @@ def fetch_top_countries(limit: int = 10) -> list[dict]:
     try:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(
-            "SELECT iso3, country, round(sum(value)::numeric) AS value FROM ("
-            "SELECT DISTINCT ON (iso3, event_type) iso3, country, value "
+            "SELECT iso3, country, round(("
+            "  COALESCE(sum(value) FILTER (WHERE event_type NOT IN ('idp','displacement','dtm_idp')), 0)"
+            "  + COALESCE(max(value) FILTER (WHERE event_type IN ('idp','displacement','dtm_idp')), 0)"
+            ")::numeric) AS value FROM ("
+            "SELECT DISTINCT ON (iso3, event_type) iso3, country, event_type, value "
             "FROM events WHERE status='active' AND value IS NOT NULL "
             "AND event_type IN "
             "('refugees','asylum','refugees_origin','idp','displacement','dtm_idp','asylum_origin','ooc_origin','oip_origin') "
