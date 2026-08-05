@@ -1,10 +1,15 @@
-const CACHE = "migrationflow-v18";
+const CACHE = "migrationflow-v19";
 const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "screenshots/mobile.png", "screenshots/wide.png", "vendor/leaflet.js", "vendor/leaflet.css", "vendor/leaflet.markercluster.js", "vendor/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
 
-const STABLE_RE = /\.(png|svg|jpg|jpeg|webp|gif|ico|woff2?|ttf|css|js|geojson|webmanifest)$/;
-
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
+  // cache: "reload" -> ignora la caché HTTP del navegador para precachear SIEMPRE la versión nueva.
+  e.waitUntil(
+    caches.open(CACHE).then((c) =>
+      Promise.all(ASSETS.map((a) =>
+        fetch(a, { cache: "reload" }).then((r) => { if (r && r.ok) return c.put(a, r); }).catch(() => {})
+      ))
+    )
+  );
   self.skipWaiting();
 });
 
@@ -44,48 +49,19 @@ self.addEventListener("fetch", (e) => {
   if (url.origin !== location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
 
-  // Página principal: network-first (siempre fresca), fallback a caché.
-  if (e.request.mode === "navigate") {
-    e.respondWith(
-      fetch(e.request)
-        .then((res) => {
+  // Network-first con fallback a caché: siempre sirve la versión nueva cuando hay red
+  // (cache: "no-cache" fuerza revalidación) y guarda una copia para offline.
+  e.respondWith(
+    fetch(e.request, { cache: "no-cache" })
+      .then((res) => {
+        if (res && res.ok) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(e.request, copy));
-          return res;
-        })
-        .catch(() => caches.match("/"))
-    );
-    return;
-  }
-
-  // Assets estables (js, css, imágenes, geojson): cache-first con actualización
-  // en segundo plano (stale-while-revalidate). Carga instantánea offline.
-  if (STABLE_RE.test(url.pathname)) {
-    e.respondWith(
-      caches.match(e.request).then((cached) => {
-        const network = fetch(e.request)
-          .then((res) => {
-            if (res && res.ok) {
-              const copy = res.clone();
-              caches.open(CACHE).then((c) => c.put(e.request, copy));
-            }
-            return res;
-          })
-          .catch(() => cached);
-        return cached || network;
-      })
-    );
-    return;
-  }
-
-  // Resto: network-first con fallback a caché.
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
         return res;
       })
-      .catch(() => caches.match(e.request).then((cached) => cached || caches.match("/")))
+      .catch(() =>
+        caches.match(e.request).then((cached) => cached || caches.match("/"))
+      )
   );
 });
