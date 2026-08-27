@@ -36,6 +36,17 @@ def get_pool():
 def get_conn():
     conn = get_pool().getconn()
     conn.autocommit = False
+    # Health check: if connection is stale, discard and get a fresh one
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1")
+    except Exception:
+        try:
+            get_pool().putconn(conn, close=True)
+        except Exception:
+            pass
+        conn = get_pool().getconn()
+        conn.autocommit = False
     return conn
 
 
