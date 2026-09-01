@@ -12,3 +12,4 @@ data/*.json
 *.db
 .DS_Store
 analytics/
+*.bak-*
