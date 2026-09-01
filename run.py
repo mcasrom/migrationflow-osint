@@ -26,6 +26,7 @@ COLLECTORS = {
     "frontex": ("src.collectors.frontex", "FrontexCollector"),
     "caminando_fronteras": ("src.collectors.caminando_fronteras", "CaminandoFronterasCollector"),
     "news": ("src.collectors.news", "NewsCollector"),
+    "es_news": ("src.collectors.es_news", "ESNewsCollector"),
 }
 
 
