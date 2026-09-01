@@ -1,5 +1,5 @@
 const CACHE = "migrationflow-v20";
-const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "screenshots/mobile.png", "screenshots/wide.png", "vendor/leaflet.js", "vendor/leaflet.css", "vendor/leaflet.markercluster.js", "vendor/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
+const ASSETS = ["/", "index.html", "style.css", "app.js", "i18n.js", "routes.js", "countries.geojson", "manifest.webmanifest", "icon.svg", "favicon-32.png", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "maskable.png", "og.png", "screenshots/mobile.png", "screenshots/wide.png", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js", "https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js", "vendor/MarkerCluster.css", "vendor/MarkerCluster.Default.css"];
 
 self.addEventListener("install", (e) => {
   // cache: "reload" -> ignora la caché HTTP del navegador para precachear SIEMPRE la versión nueva.
