@@ -4,7 +4,7 @@ const LEVEL_COLOR = { info: "#4a9eff", warning: "#ffb020", alert: "#ff7043", cri
 const KOFI_URL = "https://ko-fi.com/m_castillo";
 
 const TYPE_ORDER = ["refugees", "asylum", "refugees_origin", "asylum_origin", "ooc_origin", "oip_origin", "idp", "displacement", "dtm_idp", "arrivals", "arrivals_route", "missing", "cf_victims", "news"];
-const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "asylum_origin", "ooc_origin", "oip_origin", "arrivals_route", "news"];
+const TYPE_DEFAULT_HIDDEN = ["refugees_origin", "asylum_origin", "ooc_origin", "oip_origin", "arrivals_route"];
 
 let map, darkLayer, lightLayer, layers = {}, heatLayer = null, routesLayer = null;
 let countryLayer = null, isoToLayer = new Map(), nameToIso = new Map();
